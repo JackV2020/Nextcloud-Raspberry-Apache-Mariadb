@@ -1,0 +1,11 @@
+----- When adding a Windows client hangs
+
+sudo geany /var/www/nextcloud/config/config.php
+
+add :
+
+  'overwriteprotocol' => 'https',
+
+Save file
+
+Retry and it should work.

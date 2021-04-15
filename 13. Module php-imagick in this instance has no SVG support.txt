@@ -1,0 +1,7 @@
+----- Module php-imagick in this instance has no SVG support.
+
+Found this somewhere on the Internet :
+
+sudo apt-get install libmagickcore-6.q16-6-extra
+
+solved it.

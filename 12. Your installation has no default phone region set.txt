@@ -1,0 +1,8 @@
+----- Your installation has no default phone region set
+
+sudo geany /var/www/nextcloud/config/config.php
+
+add :',
+  'default_phone_region' => 'NL',
+  
+sudo systemctl restart apache2

@@ -1,0 +1,4 @@
+----- A background job is pending that checks for user imported SSL certificates.
+
+Message gone after implementing '14. Some jobs haven’t been executed since.....txt'
+

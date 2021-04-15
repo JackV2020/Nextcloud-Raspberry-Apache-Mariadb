@@ -1,0 +1,12 @@
+----- Host-Prefix according to scan.nextcloud.com
+
+On the Overview page there is an option to go to scan.nextcloud.com to check if your implementation is healthy.
+
+It may return a Host-Prefix warning.
+
+I decided to not fix it after reading https://help.nextcloud.com/t/security---host-prefix-cookie-setting/9740
+
+I have read somewhere that this is due to the location of nexcloud as subdomain.
+It should be accessed via https://qqq.qqq.qqq/ directly and not https://qqq.qqq.qqq/nextcloud
+
+Did not fix this until today.

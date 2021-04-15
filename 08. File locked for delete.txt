@@ -1,0 +1,58 @@
+----- File locked for delete
+
+Check if there are any locks :
+
+sudo mysql -e "use nextclouddb;SELECT * FROM oc_file_locks WHERE oc_file_locks.lock = 1;"
+When there are no locks there is no output.
+
+put Nextcloud in maintenance mode: 
+
+	sudo geany /var/www/html/nextcloud/config/config.php &
+
+and change this line:
+'maintenance' => true,
+and save file
+
+	sudo mysql -u nextclouduser -p nextclouddb
+    enter password of your db user named nextclouduser
+
+	SELECT * FROM oc_file_locks WHERE oc_file_locks.lock = 1;
+	and see locks
+
+	DELETE FROM oc_file_locks WHERE oc_file_locks.lock = 1;
+	notice the number of rows affected
+
+	SELECT * FROM oc_file_locks WHERE oc_file_locks.lock = 1;
+	no more locks
+
+disable file locking : 
+
+	sudo geany /var/www/html/nextcloud/config/config/config.php &
+
+and add this line 
+
+'filelocking.enabled'=> false,
+and save file
+
+take out of maintenance :
+'maintenance' => false,
+
+save file
+
+now do file cleanup :
+ - delete file from web page, 
+ - or login to nextcloud web page 
+ - or phone app with user account
+ - just locate file and delete it.
+
+now using steps like above :
+
+'maintenance' => true,
+save file
+
+'filelocking.enabled'=> true, or remove this line
+save file
+
+'maintenance' => false,
+save file
+

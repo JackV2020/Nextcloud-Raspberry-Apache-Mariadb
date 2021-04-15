@@ -1,0 +1,4 @@
+----- Need user quota different than suggestions in dropdown box
+
+Need other value than from dropdowlist ?
+Just type a + followed by amount like : +50 GB

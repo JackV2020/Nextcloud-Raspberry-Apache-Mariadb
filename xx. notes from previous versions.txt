@@ -1,0 +1,10 @@
+***** PHP configuration option output_buffering must be disabled
+
+	sudo geany /etc/php/7.3/apache2/php.ini
+
+Change : output_buffering = 4096
+To     : output_buffering = 0
+
+	sudo systemctl restart apache2
+
+Click Overview in the left pane and the message does not show anymore.

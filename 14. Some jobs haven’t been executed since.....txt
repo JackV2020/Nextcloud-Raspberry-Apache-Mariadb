@@ -1,0 +1,22 @@
+----- Some jobs haven’t been executed since.....
+
+Background jobs
+
+Some jobs haven’t been executed since 2 months ago. Please consider increasing the execution frequency. 
+
+Switched to cron and :
+
+crontab -u www-data -e
+
+*/5  *  *  *  * php -f /var/www/nextcloud/cron.php
+
+This casued 'some' load on my Raspberry Pi and processes took much longer than 5 minutes to run so they were running in parallel.
+I could see that using the nesxt command :
+    
+    watch "ps -ef | grep nextcloud"
+
+So I changed it to run once a day at 07:00 AM :
+
+0  7  *  *  * php -f /var/www/nextcloud/cron.php
+
+I may decrease the interval in future but at this moment just once a day.

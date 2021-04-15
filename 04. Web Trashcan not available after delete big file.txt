@@ -1,0 +1,31 @@
+----- Web Trashcan not available after delete big file
+
+When you delete a big file on your Windows the file is removed but the trashcan in the web interface is not usable anymore.
+
+In the logging you may see a message like : Trash bin: AbstractTrash::getSize() must be of the type integer, float returned
+
+To fix this I did the next but do not do that anymore. ( What I do is 1 line further below )
+
+sudo -u www-data php /var/www/html/nextcloud/occ trashbin:cleanup usernameofuserwithissue
+
+
+To fix this 'permanently' I do the next after every upgrade (using info from error: AbstractTrash::getSize() ) :
+
+	sudo geany /var/www/nextcloud/apps/files_trashbin/lib/Sabre/AbstractTrash.php
+
+Change :
+
+
+	public function getSize(): int {
+		return $this->data->getSize();
+	}
+
+to force it to return an integer by inserting (int)  :
+
+	public function getSize(): int {
+	    return (int)$this->data->getSize();
+	}
+
+
+I also asked the Nextcloud team to include this in Nextcloud. Waiting on that.....
+

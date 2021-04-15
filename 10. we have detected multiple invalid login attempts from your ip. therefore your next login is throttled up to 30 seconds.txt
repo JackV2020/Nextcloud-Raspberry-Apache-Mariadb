@@ -1,0 +1,42 @@
+----- we have detected multiple invalid login attempts from your ip. therefore your next login is throttled up to 30 seconds.
+
+Option 1)
+
+Login with management account on web interface from location where you can get in.
+	top right circle > Settings > Security > Brute-force IP whitelist
+When this option is not there you need to install the APP :
+	top right circle > APPS > Security > Brute-force settings
+
+Modify the whitelist:
+
+Add LAN network like 192.168.2.0  24
+Now you can get in from the LAN ( 24 is network mask 255.255.255.0 )
+
+Add your public IP address like : 123.134.123.123 0
+Now you can get in from the LAN ( 0 is network mask 255.255.255.255 )
+Now you can get in from Internet
+
+To see the entries in the database :
+sudo mysql -u nextclouduser -p nextclouddb
+select * from oc_appconfig where appid like '%brute%';
+
+to see the invalid logins :
+select * from oc_bruteforce_attempts;
+
+get rid of the logins :
+DELETE FROM oc_bruteforce_attempts; 
+optionallly add WHERE ip = 'aaa.bbb.ccc.ddd'; 
+
+Option 2)
+sudo mysql -e "use nextclouddb;select * from oc_bruteforce_attempts;"
+sudo mysql -e "use nextclouddb;delete from oc_bruteforce_attempts;"
+sudo mysql -e "use nextclouddb;select * from oc_appconfig where appid like '%brute%';"
+
+
+optionally shrink the database to free up sspace :
+VACUUM;
+
+Option last) just some  notes
+
+restart ISP router
+

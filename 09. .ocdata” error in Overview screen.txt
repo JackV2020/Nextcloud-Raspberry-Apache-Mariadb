@@ -1,0 +1,9 @@
+----- .ocdata” error in Overview screen
+
+Ensure there is a file called “.ocdata” in the root of the data directory
+
+Found medicine on the Internet : 
+Go to Basic Settings click Webcron, and after that back to Ajax. 
+The message is gone.
+
+By the way I am using cron now. See other note for that

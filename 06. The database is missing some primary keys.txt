@@ -1,0 +1,11 @@
+----- The database is missing some primary keys
+
+The database is missing some primary keys. 
+Due to the fact that adding primary keys on big tables could take some time they were not added automatically. 
+By running "occ db:add-missing-primary-keys" those missing primary keys could be added manually while the instance keeps running.
+
+Note that the message indicates that this can be done online so :
+
+	sudo -u www-data php /var/www/html/nextcloud/occ db:add-missing-primary-keys
+
+Click Overview in the left pane and the message does not show anymore.

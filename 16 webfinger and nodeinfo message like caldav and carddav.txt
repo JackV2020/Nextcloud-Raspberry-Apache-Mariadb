@@ -1,0 +1,112 @@
+----- webfinger and nodeinfo message like caldav and carddav
+
+In the overview you see :
+
+    Your web server is not properly set up to resolve "/.well-known/webfinger". Further information can be found in the documentation.
+    Your web server is not properly set up to resolve "/.well-known/nodeinfo". Further information can be found in the documentation.
+
+Could not find a working solution but saw indications that it has to do with apps I do not even have running.
+
+After digging in the code ( see below  -------- a couple of lines below ) and decided on the next :
+
+A dirty trick to get rid of the messages is edit ./apps/settings/js/admin.js
+
+and change :
+
+			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/webfinger', OC.theme.docPlaceholderUrl, $('#postsetupchecks').data('check-wellknown') === true, [200, 404], true),
+			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/nodeinfo', OC.theme.docPlaceholderUrl, $('#postsetupchecks').data('check-wellknown') === true, [200, 404], true),
+
+into 
+			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/webfinger', OC.theme.docPlaceholderUrl, false, [200, 404], true),
+			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/nodeinfo', OC.theme.docPlaceholderUrl, false, [200, 404], true),
+
+and wait for a next upgrade in which we receive an admin.js which only checks what needs to be checked based on requirements by installed Apps etc.
+
+By the way the 'false' means for checkWellKnownUrl to completely skip the test.
+
+-----------------------------------------------------------------------------------------------
+
+Some digging in the code.......
+
+Look into the nextcloud software itself by :
+
+> cd /var/www/nextcloud
+
+Find all filesnames of files in this directory tree containing 'webfinger'
+
+> grep -ril . -e webfinger
+gives : ./apps/settings/js/admin.js
+
+> grep -e webfinger ./apps/settings/js/admin.js
+gives : OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/webfinger', OC.theme.docPlaceholderUrl, $('#postsetupchecks').data('check-wellknown') === true, [200, 404], true),
+
+> grep -e nodeinfo ./apps/settings/js/admin.js
+gives : OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/nodeinfo', OC.theme.docPlaceholderUrl, $('#postsetupchecks').data('check-wellknown') === true, [200, 404], true),
+
+There are calls to checkWellKnownUrl so search for that
+
+> grep -ril . -e checkWellKnownUrl
+gives :  ./core/js/setupchecks.js
+
+In there I find a line which reports the messages in the Overview page.
+Change it to include information on xhdr.status :
+
+						msg: t('core', 'Your web server is not properly set up to resolve "{url}". Further information can be found in the <a target="_blank" rel="noreferrer noopener" href="{docLink}">documentation</a>. "{status}"', { docLink: docUrl, url: url , status: xhr.status }),
+
+After pressing F5 in your browser while on the Overview page see the status 404 added :
+
+    Your web server is not properly set up to resolve "/.well-known/webfinger". Further information can be found in the documentation. "404"
+    Your web server is not properly set up to resolve "/.well-known/nodeinfo". Further information can be found in the documentation. "404"
+
+Above you saw that the 404 is in the function call together with the 200 value as expected status.
+
+In the code of ./core/js/setupchecks.js , just above the msg you find :
+				if (expectedStatus.indexOf(xhr.status) === -1 || (checkCustomHeader && !customWellKnown)) {
+
+Here xhr.status is 404 as seen on the Overview page.
+checkCustomHeader is the last parameter of the function and is passed as true ( just after [200, 404] )
+customWellKnown is found by the code when there is a return of 'X-NEXTCLOUD-WELL-KNOWN'
+
+So looking for that 
+
+> grep -ril . -e 'X-NEXTCLOUD-WELL-KNOWN'
+
+gives : ./core/Controller/WellKnownController.php
+
+Have a look into that file a little later.....
+
+First check the redirection mechanism in .htaccess with [301,L] at the end :
+ ( [301,L] is not what you want in the end but is good for testing )
+
+  RewriteRule ^\.well-known/nodeinfo /nextcloud/index.php/nodeinfo [R=301,L]
+
+> curl -k https://veraart.thehomeserver.net/nextcloud/.well-known/nodeinfo
+
+This gives a nice redirection message
+
+Changing nodeinfo to nodeinfooooooo it to 
+  RewriteRule ^\.well-known/nodeinfo /nextcloud/index.php/nodeinfooooooo [R=301,L]
+
+Gives the expected result so redirection mechanism works.
+
+Now change the [R=301,L] to [QSA,L]
+  RewriteRule ^\.well-known/nodeinfo /nextcloud/index.php/nodeinfo [QSA,L]
+
+> curl -k https://veraart.thehomeserver.net/nextcloud/.well-known/nodeinfo
+
+And all what is returned is : {"message":"nodeinfo not supported"}
+
+
+Now look into ./core/Controller/WellKnownController.php.
+There is a line which constructs the {"message":"nodeinfo not supported"} :
+
+			$httpResponse = new JSONResponse(["message" => "$service not supported"], Http::STATUS_NOT_FOUND);
+
+Change the m to an M the return messages has the M in it :
+
+{"Message":"nodeinfo not supported"}
+
+Change the M back to an m the return messages has the m in it again.
+
+So it seems the redirection has to be in .htaccess but Nextcloud can not find the service.
+

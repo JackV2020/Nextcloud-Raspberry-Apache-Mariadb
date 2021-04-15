@@ -1,0 +1,13 @@
+----- Tuning maximum file size
+
+sudo geany /etc/php/7.3/apache2/php.ini &
+
+change :
+post_max_size = 8M
+upload_max_filesize = 2M
+to
+post_max_size = 1024M
+upload_max_filesize = 20480M
+
+
+sudo service apache2 restart

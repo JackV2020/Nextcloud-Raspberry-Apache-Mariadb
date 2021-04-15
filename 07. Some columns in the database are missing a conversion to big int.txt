@@ -1,0 +1,25 @@
+----- Some columns in the database are missing a conversion to big int.
+
+Some columns in the database are missing a conversion to big int. 
+Due to the fact that changing column types on big tables could take some time they were not changed automatically. 
+By running 'occ db:convert-filecache-bigint' those pending changes could be applied manually. 
+This operation needs to be made while the instance is offline. 
+For further details read the documentation page about this.
+
+Note that the message indicates that this can NOT be done online so :
+
+	sudo geany /var/www/html/nextcloud/config/config.php &
+Insert maintenance mode / change to
+  'maintenance' => true,
+
+save file
+
+	sudo -u www-data php /var/www/html/nextcloud/occ db:convert-filecache-bigint
+
+	sudo	geany /var/www/html/nextcloud/config/config.php &
+Change maintenance mode to
+  'maintenance' => false,
+
+save file
+
+Click Overview in the left pane and the message does not show anymore.
