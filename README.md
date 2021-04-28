@@ -21,9 +21,9 @@ Issues solved after the installation are in subsequent documents.
 I hope these notes help me and you to stay green in the future.
 
 
-'00. Nextcloud 20.0.4 on Raspberry Pi 4 running Buster.txt'
-'01. When adding a Windows client hangs.txt'
-'02. Need user quota different than suggestions in dropdown box.txt'
+    '00. Nextcloud 20.0.4 on Raspberry Pi 4 running Buster.txt'
+    '01. When adding a Windows client hangs.txt'
+    '02. Need user quota different than suggestions in dropdown box.txt'
 '03. Tuning maximum file size.txt'
 '04. Web Trashcan not available after delete big file.txt'                                                              
 '05. The database is missing some indexes.txt'                                                                          
