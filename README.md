@@ -36,6 +36,6 @@ I hope these notes help me and you to stay green in the future.
     '12. Your installation has no default phone region set.txt'
     '13. Module php-imagick in this instance has no SVG support.txt'
     '14. Some jobs haven’t been executed since.....txt'
-    '15 A background job is pending that checks for user imported SSL certificates.txt'
-    '16 webfinger and nodeinfo message like caldav and carddav.txt'
+    '15. A background job is pending that checks for user imported SSL certificates.txt'
+    '16. webfinger and nodeinfo message like caldav and carddav.txt'
     'xx. notes from previous versions.txt'
