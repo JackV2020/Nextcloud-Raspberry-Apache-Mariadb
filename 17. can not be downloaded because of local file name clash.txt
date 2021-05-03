@@ -1,0 +1,26 @@
+----- can not be downloaded because of local file name clash!
+
+In the client Settings window with the folder structure you see the message :
+
+    'server file name : File local file name' can not be downloaded because of local file name clash
+
+On the client go to the folder of the file and see :
+
+
+'local file name' with a red ball and a white cross
+
+and also
+
+'local file name'.~xyz with a yellow ball and a white exlamation mark !
+
+~xyz can be anything but starts with a ~
+
+Do not touch 'local file name'.~xyz
+
+Move 'local file name' to a location outside that specific nextcloud folder and sync again.
+
+The other folder may be any folder, even a nextcloud folder.
+
+After the successful sync the file arrived from the server and you can delete the moved file.
+
+'local file name'.~xyz disappears by itself.

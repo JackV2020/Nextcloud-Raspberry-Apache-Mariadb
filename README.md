@@ -38,4 +38,5 @@ I hope these notes help me and you to stay green in the future.
     '14. Some jobs haven’t been executed since.....txt'
     '15. A background job is pending that checks for user imported SSL certificates.txt'
     '16. webfinger and nodeinfo message like caldav and carddav.txt'
+    '17. can not be downloaded because of local file name clash.txt'
     'xx. notes from previous versions.txt'
