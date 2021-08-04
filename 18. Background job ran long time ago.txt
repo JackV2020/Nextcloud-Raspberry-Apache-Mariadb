@@ -17,3 +17,17 @@ Kept keeping issues and found a solution on :
 and changed it to :
 
 */5  *  *  *  * php -f /var/www/nextcloud/cron.php --define apc.enable_cli=1
+
+Later found a warning in the Nextcloud docu where cache setup is explained :
+
+    https://docs.nextcloud.com/server/stable/admin_manual/configuration_server/caching_configuration.html
+
+    At the end of the section about APCu :
+
+    Warning
+
+    APCu is disabled by default on CLI which could cause issues with nextcloud’s cron jobs. 
+    Please make sure you set the apc.enable_cli to 1 on your php.ini config file or append
+    --define apc.enable_cli=1 to the cron job call.
+
+So the fix is fine 8-)
