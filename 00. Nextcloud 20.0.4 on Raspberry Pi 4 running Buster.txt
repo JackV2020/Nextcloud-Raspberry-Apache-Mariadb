@@ -410,8 +410,10 @@ https://docs.nextcloud.com/server/20/admin_manual/configuration_server/caching_c
 
 	sudo geany /var/www/nextcloud/config/config.php
 
-add :   'memcache.local' => '\OC\Memcache\APCu',
+add         :   'memcache.local' => '\OC\Memcache\APCu',
+had to be   :   'memcache.local' => '\\OC\\Memcache\\APCu',
 
+( see https://markus-blog.de/index.php/2018/05/30/how-to-install-apcu-object-cache-in-php7-and-integrate-in-nextcloud/ )
 
 sudo systemctl restart apache2
 
