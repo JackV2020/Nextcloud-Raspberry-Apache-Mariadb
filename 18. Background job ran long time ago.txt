@@ -1,0 +1,19 @@
+----- Warnings concerning background job ran long time ago
+
+In the Administration Overview and Administration Basic settings you have messages about the background job.
+
+I created a crontab job as documented in the Nextcloud documentation :
+
+crontab -u www-data -e
+
+and added the next line :
+
+*/5  *  *  *  * php -f /var/www/nextcloud/cron.php
+
+Kept keeping issues and found a solution on :
+
+# https://help.nextcloud.com/t/solved-last-background-job-execution-ran-8-days-ago/121082
+
+and changed it to :
+
+*/5  *  *  *  * php -f /var/www/nextcloud/cron.php --define apc.enable_cli=1
