@@ -1,0 +1,13 @@
+----- Send files to your Nextcloud/Owncloud from the command line
+
+Bash script to send files to a nextcloud/owncloud shared folder :
+
+https://github.com/tavinus/cloudsend.sh
+
+ - supports pipe output to save direct in file in nextcloud/owncloud
+ - create a share in your nexcloud/owncloud and make sure it is writable
+
+Nextcloud / Owncloud CLI Webdav Client  :
+
+https://github.com/tavinus/cloudmanager
+
