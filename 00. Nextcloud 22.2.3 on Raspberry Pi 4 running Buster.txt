@@ -1,0 +1,26 @@
+Starting situation is '00. Nextcloud 22.0.0 on Raspberry Pi 4 running Buster'
+
+After the upgrade :
+
+------------ solving issues :
+
+Here are the issues I ran into right after upgrading and solved.
+
+Logon to your nextcloud website.
+
+Click Setting.
+Click Overview in the left pane.
+
+Security & setup warnings
+
+It's important for the security and performance of your instance that everything is configured correctly. To help you with that we are doing some automatic checks. Please see the linked documentation for more information.
+There are some warnings regarding your setup.
+
+    Your web server is not properly set up to resolve "/.well-known/webfinger". Further information can be found in the documentation ↗.
+    Your web server is not properly set up to resolve "/.well-known/nodeinfo". Further information can be found in the documentation ↗.
+
+Again "Solved" by document '16. webfinger and nodeinfo message like caldav and carddav'
+
+Also needed to make a chane again :
+
+- 04. Web Trashcan not available after delete big file

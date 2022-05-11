@@ -5,7 +5,12 @@ By running "occ db:add-missing-indices" those missing indexes could be added man
 Once the indexes are added queries to those tables are usually much faster.
 
 Note that the message indicates that this can be done online so :
+    
+    sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
+An unhandled exception has been thrown:
+OC\HintException: [0]: Memcache \OC\Memcache\APCu not available for local cache (Is the matching PHP module installed and enabled?)
 
-	sudo -u www-data php /var/www/html/nextcloud/occ db:add-missing-indices
+Add '--define apc.enable_cli=1' to solve this issue :
+    sudo -u www-data php --define apc.enable_cli=1 /var/www/nextcloud/occ db:add-missing-indices
 
 Click Overview in the left pane and the message does not show anymore.

@@ -11,6 +11,8 @@ After digging in the code ( see below  -------- a couple of lines below ) and de
 
 A dirty trick to get rid of the messages is edit ./apps/settings/js/admin.js
 
+geany /var/www/nextcloud/apps/settings/js/admin.js &
+
 and change :
 
 			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/webfinger', OC.theme.docPlaceholderUrl, $('#postsetupchecks').data('check-wellknown') === true, [200, 404], true),
@@ -21,6 +23,9 @@ into
 			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/nodeinfo', OC.theme.docPlaceholderUrl, false, [200, 404], true),
 
 and wait for a next upgrade in which we receive an admin.js which only checks what needs to be checked based on requirements by installed Apps etc.
+
+To get it active I tried restarting my browser, apache but ended up with rebooting my Pi by 'init 6' and after that the messages were gone.
+After upgrading from 22.0.0 to 22.2.3 I also needed to stop and start my browser. Maybe for cleanup of history, cookies etc which my Firefox does when it closes.
 
 By the way the 'false' means for checkWellKnownUrl to completely skip the test.
 
