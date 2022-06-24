@@ -1,0 +1,213 @@
+----- PHP version 7.3 upgrade to 8.0
+
+    These are my notes on Raspberri Pi Buster with Nextcloud Hub II (23.0.6) and mysql to upgrade PHP from 7.3 to 8.0.
+    ( I can not yet upgrade my Pi to Bullseye because I am also running Domoticz which is not yet supported on Bullseye)
+
+    On the 'Security & setup warnings' you have the next message like :
+
+    Nextcloud 23 is the last release supporting PHP 7.3. Nextcloud 24 requires at least PHP 7.4.
+    
+    Somewhere else I found that 8.0 is recommended so I decided to upgrade to 8.0.
+
+    Login as pi, like you always do.
+    
+    First save some info concering the current installation, just in case.
+
+php --version | tee ~/php_version.txt
+
+php -m | tee ~/php_mods.txt
+
+    Create a file to show apache php info  /var/www/html/info.php 
+
+<?php
+phpinfo();
+?>
+
+    Browse to the file to give you some info.
+    
+http://<yourserver>/info.php
+
+    Save the web page in a file for reference.
+
+    Go to maintenance mode : 
+
+sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --on
+
+    When you have an error concerning something with Memcache :
+    Edit                :   /etc/php/7.3/cli/php.ini
+    Add as last line    :  apc.enable_cli = 1
+    Save file
+    And again           : -u www-data php /var/www/nextcloud/occ maintenance:mode --on
+
+sudo systemctl stop apache2
+sudo systemctl stop mysql
+sudo systemctl disable apache2
+sudo systemctl disable mysql
+
+    Create image backup, restore image on new uSD card and boot new image.
+    How to backup and restore an image is not part of this but you should work this way.
+    When you run into issues, you can insert your old uSD card, reboot, enable and start mysql and apache2 en leave maintenance mode.
+    
+    After reboot of the new uSD card expand the file system.
+    
+sudo raspi-config
+6 Advanced Options
+A1 Expand Filesystem
+
+    Leave raspi-config and reboot
+
+    Following instructions from : https://pimylifeup.com/raspberry-pi-latest-php/
+    This enables us to install any php version we want ( as long as it is supported on the OS )
+    And is perfect for PHP upgrade but not complete for Nextcloud so make sure to read my notes below...
+    
+curl https://packages.sury.org/php/apt.gpg | sudo tee /usr/share/keyrings/suryphp-archive-keyring.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/suryphp-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+sudo apt update
+
+    >>>> DO NOT 'sudo apt upgrade' to upgrade packages <<<<
+
+sudo apt install php8.0-cli
+
+    Create test file.
+    
+echo "<?php echo 'Hello World';" > test.php
+
+    Test the file.
+
+php8.0 test.php
+    
+    Should show 'Hello World'
+    
+    Now check if your Nextcloud required modules are there.
+    
+php8.0 -m
+
+    And compare with requirements on https://docs.nextcloud.com/server/latest/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
+
+    I was missing some and the command to install them is :
+
+sudo apt-get install php8.0-{curl,dom,GD,mbstring,SimpleXML,XMLReader,XMLWriter,zip,pdo_mysql,bz2,intl,exif,apcu}
+
+    I got errors on pdo_mysql so for this I looked back in the file I saved before in ~/php_mods.txt
+    and decided to replace pdo_mysql by mysqli,mysqlnd :
+    
+sudo apt-get install php8.0-{curl,dom,GD,mbstring,SimpleXML,XMLReader,XMLWriter,zip,mysqli,mysqlnd,bz2,intl,exif,apcu}
+
+    This seemed to work just fine. ;-)
+
+    Time to enable php8.0 in apache.
+    
+sudo a2dismod php7.3
+sudo a2enmod php8.0
+
+    This gives an error like : ERROR: Module php8.0 does not exist!
+    We are missing a module so let's install that.
+    
+sudo apt-get install libapache2-mod-php8.0
+
+    Note that the output ends with 'apache2_invoke: Enable module php8.0'
+    Being me, I just tried to enable it again. 
+    
+sudo a2enmod php8.0
+
+    Received expected message.
+    Now this works let's try to startup things.
+    
+sudo systemctl enable mysql
+sudo systemctl enable apache2
+sudo systemctl start mysql
+sudo systemctl start apache2
+
+    And browse to the file to give you some info
+    
+http://<yourserver>/info.php
+
+    You should see php8.0 info now.
+    Great so we are ready to leave maintenance mode.
+    
+    I had to solve 2 errors below , not sure in which order.
+
+sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --off
+
+    When you have an error concerning something of Memcache ( history repeats itself ) :
+    Edit                :   /etc/php/8.0/cli/php.ini
+    Add as last line    :  apc.enable_cli = 1
+    Save file
+    And again           : -u www-data php /var/www/nextcloud/occ maintenance:mode --on
+
+    When you have an error stating you are running php8.1 ( duh ? 8.1 , yes, 8.1 ) which is not supported
+    Set version to 8.0  :    sudo update-alternatives --config php
+    ( in the menu enter the number which is in front of the version 8.0, for me it was option 2 )
+    And again           : sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --off
+
+    Now browse to you nextcloud instance and log in and check the 'Security & setup warnings' page.
+    
+    It gave me ( without the numbers in front which I put there to discuss things below ) :
+
+There are some errors regarding your setup.
+1) Last background job execution ran 19 hours ago. Something seems wrong. Check the background job settings ↗.
+2) The PHP memory limit is below the recommended value of 512MB.
+3) Your web server is not properly set up to resolve "/.well-known/webfinger". Further information can be found in the documentation ↗.
+4) Your web server is not properly set up to resolve "/.well-known/nodeinfo". Further information can be found in the documentation ↗.
+5) The PHP module "imagick" is not enabled although the theming app is. For favicon generation to work correctly, you need to install and enable this module.
+6) The PHP modules "gmp" and/or "bcmath" are not enabled. If you use WebAuthn passwordless authentication, these modules are required.
+    
+
+----- 1) Is something I am aware of. I run Nextcloud for 2 users at home and do not need something to kill my uSD card so I have :
+    
+crontab -u www-data -l | grep nextcloud
+0  0  *  *  * php -f /var/www/nextcloud/cron.php --define apc.enable_cli=1
+
+    ( note that I have apc.enable_cli=1 on the command line above and may not need that because that is in the php.ini now )
+
+----- 2) The PHP memory limit is below the recommended value of 512MB.
+
+sudo geany /etc/php/8.0/apache2/php.ini &
+
+Change : memory_limit = 128M
+To     : memory_limit = 512M
+
+Save file
+
+	sudo systemctl restart apache2
+    
+----- 3) and 4) webfinger and nodeinfo
+    
+    I had this error before, this has something to do with APPs I do not use so I disabled the check before and do it again.
+
+    Short description is below.
+    ( For details look in my document '16. webfinger and nodeinfo message like caldav and carddav.txt'. )
+    
+    Edit /var/www/nextcloud/apps/settings/js/admin.js
+
+and change lines 265 and 266 :
+
+			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/webfinger', OC.theme.docPlaceholderUrl, $('#postsetupchecks').data('check-wellknown') === true, [200, 404], true),
+			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/nodeinfo', OC.theme.docPlaceholderUrl, $('#postsetupchecks').data('check-wellknown') === true, [200, 404], true),
+
+into 
+			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/webfinger', OC.theme.docPlaceholderUrl, false, [200, 404], true),
+			OC.SetupChecks.checkWellKnownUrl('GET', '/.well-known/nodeinfo', OC.theme.docPlaceholderUrl, false, [200, 404], true),
+                
+    After this I cleaned everything in my browser cache and restarted my Raspberry Pi by init 6, and messages were gone.
+    ( I just closed my Firefox which I have that setup to always browse in private mode and clean everything up to avoid cookie issues with other applications.)
+    
+----- 5) and 6) PHP modules were solved by :
+
+sudo apt-get install php8.0-{imagick,gmp,bcmath}
+systemctl restart apache2    
+
+    
+    Okay so far, only message 1) is on my screen and I am happy with that.
+    
+    On the page is also a link 'Check the security of your Nextcloud over our security scan ↗.' to https://scan.nextcloud.com
+    
+    I entered my url, clicked on scan, saw my old results, did a rescan and it came up with a big green A.
+    
+    The only message below is Host-Prefix and I am not going to do anything about that.
+    
+    See '11. Host-Prefix according to scan.nextcloud.com .txt' why.
+    
+    I hope you have a big green A too.
+    
+    

@@ -2,23 +2,30 @@ These are my notes on installing Nextcloud on Raspberry Pi Buster with Apache an
 
 The last succesfull installation is in '00. Nextcloud 22.0.0 on Raspberry Pi 4 running Buster'.
 
-All solutions to the issues I had after the installation are in that document.
+All solutions to the issues I had after finishing the installation are in that document.
 
-Issues solved after the installation and previous installations are in other documents.
+Issues solved during upgrades and previous installations are in other documents.
+
+I stopped creating '00. Nextcloud.....' documents for upgrades. I only create issue documents.
+
+Note that hidden things like '04. Web Trashcan not available after delete big file.txt' can come back after each upgrade.
 
 I hope these notes help me and you to stay green in the future.
 
 
     '00. Nextcloud 20.0.4 on Raspberry Pi 4 running Buster.txt'
+    '00. Nextcloud 22.0.0 on Raspberry Pi 4 running Buster.txt'
+    '00. Nextcloud 22.2.3 on Raspberry Pi 4 running Buster.txt'
+    Not a real success : '00. Nextcloud 22.x.y on Raspberry Pi 4 running Bullseye.txt'
     '01. When adding a Windows client hangs.txt'
     '02. Need user quota different than suggestions in dropdown box.txt'
     '03. Tuning maximum file size.txt'
-    '04. Web Trashcan not available after delete big file.txt'                                                              
-    '05. The database is missing some indexes.txt'                                                                          
-    '06. The database is missing some primary keys.txt'                                                                     
-    '07. Some columns in the database are missing a conversion to big int.txt'                                              
-    '08. File locked for delete.txt'                                                                                        
-    '09. .ocdata” error in Overview screen.txt'                                                                             
+    '04. Web Trashcan not available after delete big file.txt'
+    '05. The database is missing some indexes.txt'
+    '06. The database is missing some primary keys.txt'
+    '07. Some columns in the database are missing a conversion to big int.txt'
+    '08. File locked for delete.txt'
+    '09. .ocdata” error in Overview screen.txt'
     '10. we have detected multiple invalid login attempts from your ip. therefore your next login is throttled up to 30 seconds.txt'
     '11. Host-Prefix according to scan.nextcloud.com .txt'
     '12. Your installation has no default phone region set.txt'
@@ -28,5 +35,6 @@ I hope these notes help me and you to stay green in the future.
     '16. webfinger and nodeinfo message like caldav and carddav.txt'
     '17. can not be downloaded because of local file name clash.txt'
     '18. Background job ran long time ago.txt'
+    '19. PHP version 7.3 upgrade to 8.0.txt'
     'xx. notes from previous versions.txt'
     'OK. Oke, nice to know.txt'

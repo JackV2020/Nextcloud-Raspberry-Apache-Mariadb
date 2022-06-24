@@ -21,6 +21,6 @@ There are some warnings regarding your setup.
 
 Again "Solved" by document '16. webfinger and nodeinfo message like caldav and carddav'
 
-Also needed to make a chane again :
+Also needed to make a change again :
 
 - 04. Web Trashcan not available after delete big file
