@@ -3,7 +3,7 @@
     These are my notes on Raspberri Pi Buster with Nextcloud Hub II (23.0.6) and mysql to upgrade PHP from 7.3 to 8.0.
     ( I can not yet upgrade my Pi to Bullseye because I am also running Domoticz which is not yet supported on Bullseye)
 
-    On the 'Security & setup warnings' you have the next message like :
+    I just upgraded to 23.0.6 and on the 'Security & setup warnings' I had message which was there already a long time like :
 
     Nextcloud 23 is the last release supporting PHP 7.3. Nextcloud 24 requires at least PHP 7.4.
     
@@ -152,7 +152,8 @@ There are some errors regarding your setup.
 5) The PHP module "imagick" is not enabled although the theming app is. For favicon generation to work correctly, you need to install and enable this module.
 6) The PHP modules "gmp" and/or "bcmath" are not enabled. If you use WebAuthn passwordless authentication, these modules are required.
     
-
+    By the way, the message concerning PHP is not there anymore.
+    
 ----- 1) Is something I am aware of. I run Nextcloud for 2 users at home and do not need something to kill my uSD card so I have :
     
 crontab -u www-data -l | grep nextcloud
@@ -173,7 +174,7 @@ Save file
     
 ----- 3) and 4) webfinger and nodeinfo
     
-    I had this error before, this has something to do with APPs I do not use so I disabled the check before and do it again.
+    Come back after each upgrade, this has something to do with APPs I do not use so I disabled the check before and do it again.
 
     Short description is below.
     ( For details look in my document '16. webfinger and nodeinfo message like caldav and carddav.txt'. )
@@ -202,12 +203,10 @@ systemctl restart apache2
     
     On the page is also a link 'Check the security of your Nextcloud over our security scan ↗.' to https://scan.nextcloud.com
     
-    I entered my url, clicked on scan, saw my old results, did a rescan and it came up with a big green A.
+    I entered my url, clicked on scan, saw my old results, did a rescan, waited some time refreshed the screen and it came up with a big green A.
     
-    The only message below is Host-Prefix and I am not going to do anything about that.
+    The only red message on the scan results is Host-Prefix and I am not going to do anything about that.
     
     See '11. Host-Prefix according to scan.nextcloud.com .txt' why.
     
     I hope you have a big green A too.
-    
-    
