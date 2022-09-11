@@ -5,6 +5,12 @@ In the overview you see :
     Your web server is not properly set up to resolve "/.well-known/webfinger". Further information can be found in the documentation.
     Your web server is not properly set up to resolve "/.well-known/nodeinfo". Further information can be found in the documentation.
 
+edit /var/www/nextcloud/config/config.php and add the next line :
+
+  'check_for_working_wellknown_setup' => false,
+
+----- old 'solution'
+
 Could not find a working solution but saw indications that it has to do with apps I do not even have running.
 
 After digging in the code ( see below  -------- a couple of lines below ) and decided on the next :
