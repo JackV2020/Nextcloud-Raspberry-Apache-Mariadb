@@ -1,0 +1,52 @@
+Starting situation is '00. Nextcloud 24.0.something on Raspberry Pi 4 running Buster'
+
+Since I had good experiences with the last upgrades I made a backup of my system and data and upgraded in several steps to the last version 25.0.1
+
+This was not a good idea. Although I read in the documentation that a 64 bit platform was recommended I could not find that it would not work the way I wanted.
+
+I did get out of the mess.......
+
+Some of the issues I noticed:
+<br> User quota dropped to 0 and were not changable anymore
+<br> On the web dashboard files overview only files and a warning that there were no folders
+<br> and more.....
+
+So I decided to find the last supported 24.0.something version which was 24.0.7.
+
+I did a2dissite nextcloud, reloaded apache, renamed /var/www/nextcloud to /var/www/nextcloud_old, 
+renamed the data folder /mnt/Share0/NextCloud to /mnt/Share0/NextCloud_old and created en new empty /mnt/Share0/NextCloud owned by www-data:www-data , 
+used mysql interactive to drop the database and the user and created the database, the user and granted the user rights
+
+I downloaded version 24.0.7 in /var/www, unpacked the new nextcloud folder, 'chown www-data:www-data nextcloud -R' and did a2ensite nextcloud, reloaded apache 
+and on my Rapsberry Pi I browsed to my nextcloud and configured it.
+
+Hmmmmm....same issues.....So I started searching the Internet.
+
+Somewhere I found remarks about code being changed to 64 bit in version 24.0.7 already. Some internal variables of byte changed to integer.
+
+So I did the above exercise again for version 24.0.6 and that worked just fine.
+
+I was able to add users and change the quota.
+
+Off course there were some issues on the Overview page again and with remote access.
+
+I edited the file /var/www/nextcloud/config/config.php and added what was needed from the file /var/www/nextcloud_old/config/config.php
+Do not simply copy that file because there are installation specific things in there. Compare and add what you need.
+
+In the system settings I selected to run by cron again.
+
+After this I removed the nextcloud connections for the users on the laptops and deleted the 4 files starting with a . from users the NextCloud folders.
+
+During reconnecting a user I selected the same old folder C:\Data\NextClouds\[user] and choose to download everything from the server and to keep the local data.
+
+This synced everything to the server.
+
+When a user had another laptop I could simply reconnect the same way but experience tells that Nextcloud starts comparing the files and that takes ages 
+so I removed the connection there and removed everything from the local folder.
+
+I waited for the first sync to complete.....
+
+During reconnecting a user I selected the same old folder C:\Data\NextClouds\[user] and choose to download everything from the server and to keep the local data.
+
+This synced everything back from the server and is much faster than just removing the 4 . files and leaving the data in place.
+

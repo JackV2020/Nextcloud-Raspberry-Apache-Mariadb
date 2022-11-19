@@ -1,22 +1,24 @@
 These are my notes on installing Nextcloud on Raspberry Pi Buster with Apache and Mariadb and staying green after upgrades.
 
-The last succesfull installation is in '00. Nextcloud 22.0.0 on Raspberry Pi 4 running Buster'.
+The last succesfull installation is in '00. Nextcloud 24.0.6 on Raspberry Pi 4 running Buster'.
 
 All solutions to the issues I had after finishing the installation are in that document.
 
 Issues solved during upgrades and previous installations are in other documents.
 
-I stopped creating '00. Nextcloud.....' documents for upgrades. I only create issue documents.
+I stopped creating '00. Nextcloud.....' documents for earlier upgrades. I only created issue documents.
 
 Note that hidden things like '04. Web Trashcan not available after delete big file.txt' can come back after each upgrade.
 
 I hope these notes help me and you to stay green in the future.
 
+For the time being 24.0.6 is my last and final version because I run on a 32 bit Raspberry Pi. You can check that by running lshw ( after 'sudo apt install lshw' )
 
     '00. Nextcloud 20.0.4 on Raspberry Pi 4 running Buster.txt'
     '00. Nextcloud 22.0.0 on Raspberry Pi 4 running Buster.txt'
     '00. Nextcloud 22.2.3 on Raspberry Pi 4 running Buster.txt'
     Not a real success : '00. Nextcloud 22.x.y on Raspberry Pi 4 running Bullseye.txt'
+    '00. Nextcloud 24.0.6 on Raspberry Pi 4 running Buster.txt'
     '01. When adding a Windows client hangs.txt'
     '02. Need user quota different than suggestions in dropdown box.txt'
     '03. Tuning maximum file size.txt'
