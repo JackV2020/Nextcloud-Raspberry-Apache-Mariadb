@@ -1,0 +1,43 @@
+----- Web can not delete file
+
+You find yourself in the web interface and can not delete a file
+
+First check '08. File locked for delete.txt'
+
+When that does not help continue below.
+
+sudo -i
+cd to the file location like :
+
+    cd /folder/folder/Nextclouddatafolder/username/files[/subfolder[/subfolder...]]
+
+Check if you see the file there :
+
+    ls -l
+    all files should be owned by www-data and security settings should be the same for all files.
+    -rw-r--r--  1 www-data www-data
+
+When this was ok or changing settings did not help....
+
+Assume the name of the file is issue_file.something and move it to the login folder of root.
+
+    mv issue_file.something ~/issue_file.something
+
+Start a rescan for the user , username is case sensitive and should be the same as the user folder name:
+
+    sudo -u www-data php /var/www/nextcloud/occ files:scan Jack
+It says :
+    Starting scan for user 1 out of 1 (Jack)
+
+My file was in the root folder of my web interface and was gone after I logged in again.
+
+The script was still running so I left it running overnight.
+
+Final message of the script :
+    Starting scan for user 1 out of 1 (Jack)
+    +---------+-------+--------------+
+    | Folders | Files | Elapsed time |
+    +---------+-------+--------------+
+    | 9926    | 55541 | 00:56:44     |
+    +---------+-------+--------------+
+

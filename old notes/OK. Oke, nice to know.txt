@@ -44,24 +44,3 @@ do
     echo "$(s_datetime) www-data rsync " $folder
     rsync -aq --delete /mnt/Share0/$folder www-data@pi31.home:/mnt/Share0
 done
-
------ impersonate a user
-
-When a user has questions it can be good to be able to impersonate a user.
-To do that download the right version of Impersonate from :
-https://apps.nextcloud.com/apps/impersonate
-tar -xf <downloaded.tar.gz>
-chown www-data: impersonate -R
-mv impersonate /var/www/nextcloud/apps
-systemctl restart apache2
-Web login to an admin account
-Go to the apps (Icon top right select +Apps)
-Look in the disabled apps ( 3rd from top left )
-Enable Impersonate
-Go to user management
-Select a user
-Start the menu with the 3 dots on the right
-Select the option Impersonate
-
-After you helped out you can logoff and you are back in your admin account.
-
