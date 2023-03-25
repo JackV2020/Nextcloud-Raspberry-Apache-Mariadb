@@ -15,6 +15,6 @@ Full Error Message :
 An unhandled exception has been thrown:<br>
 OCP\HintException: [0]: Memcache \OC\Memcache\APCu not available for local cache (Is the matching PHP module installed and enabled?)
 
-01. Fix Error Memcache  OC\Memcache\APCu not available
+    01. Fix Error Memcache  OC\Memcache\APCu not available
 
 
