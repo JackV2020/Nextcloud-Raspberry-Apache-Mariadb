@@ -2,9 +2,7 @@
 
 Even when I am green and APCu is configured in /var/ww/nextcloud/config/config.php by adding the line :
 
-    'memcache.local' => '\\OC\\Memcache\\APCu',
-
-    'memcache.local' => '\OC\Memcache\APCu', ....does not seem to do it
+    'memcache.local' => '\OC\Memcache\APCu',
 
 and the next in /etc/php/8.1/apache2/php.ini :
 
@@ -25,15 +23,26 @@ and the next in /etc/php/8.1/apache2/php.ini :
 
 
 both 
-sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --on
-sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --off
+    sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --on
+    sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --off
 
 give the error :
 
-An unhandled exception has been thrown:
-OCP\HintException: [0]: Memcache \OC\Memcache\APCu not available for local cache (Is the matching PHP module installed and enabled?)
+    An unhandled exception has been thrown:
+    OCP\HintException: [0]: Memcache \OC\Memcache\APCu not available for local cache (Is the matching PHP module installed and enabled?)
 
 The next works just fine :
 
-sudo -u www-data php --define apc.enable_cli=1 /var/www/nextcloud/occ maintenance:mode --on
-sudo -u www-data php --define apc.enable_cli=1 /var/www/nextcloud/occ maintenance:mode --off
+    sudo -u www-data php --define apc.enable_cli=1 /var/www/nextcloud/occ maintenance:mode --on
+    sudo -u www-data php --define apc.enable_cli=1 /var/www/nextcloud/occ maintenance:mode --off
+
+And now I additionally added 1 line to /etc/php/php8.1/mods-available/apcu.ini:
+
+    opcache.enable_cli=1
+    
+And both 
+
+    sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --on
+    sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --off
+
+just work fine

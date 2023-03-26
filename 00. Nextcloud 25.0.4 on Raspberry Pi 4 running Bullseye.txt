@@ -63,7 +63,7 @@ Install NextCloud (which was 25.0.4 at the time of installation):
 
 	sudo tar -xvf latest.tar.bz2
 
-	sudo chown -R www-data:www-data /var/www/NextCloud/
+	sudo chown -R www-data:www-data /var/www/nextcloud/
 
 I have an USB disk mounted on /mnt/Share0 and this is where I will put the NextCloud data :
 
@@ -83,15 +83,15 @@ Initial creation of Virtual host
 (Note the line with the Alias, this was not there on https://pimylifeup.com/raspberry-pi-NextCloud-server/ )
 
 <VirtualHost *:80>
-  DocumentRoot /var/www/NextCloud/
+  DocumentRoot /var/www/nextcloud/
   ServerName 192.168.2.4
 #  ServerAlias localhost
 #  ServerAlias veraart.onthewifi.com
 #  ServerAlias veraart.thehomeserver.net
   
-  Alias /NextCloud "/var/www/NextCloud/"
+  Alias /NextCloud "/var/www/nextcloud/"
 
-  <Directory /var/www/NextCloud/>
+  <Directory /var/www/nextcloud/>
     Require all granted
     AllowOverride All
     Options FollowSymLinks MultiViews
@@ -258,6 +258,30 @@ Should be redirected to https and gives info like :
 
 row 6 :	Loaded Configuration File 	/etc/php/8.1/apache2/php.ini
 
+
+------------- php default version
+
+To set the default version for the php command you use the update-alternatives command :
+
+update-alternatives --display php
+
+shows some info including a link to the current version
+
+To change the version :
+
+update-alternatives --config php
+There are 2 choices for the alternative php (providing /usr/bin/php).
+
+  Selection    Path             Priority   Status
+------------------------------------------------------------
+  0            /usr/bin/php8.2   82        auto mode
+  1            /usr/bin/php8.1   81        manual mode
+* 2            /usr/bin/php8.2   82        manual mode
+
+Press <enter> to keep the current choice[*], or type selection number:
+
+Make the right choice here and select 1 so all nextcloud related php cli commands by user www-data use 8.1 and not 8.2
+
 ---------- Configure the ISP router
 
 You will need to port forward two ports to finally have NextCloud up and running. 
@@ -280,7 +304,7 @@ I use https://freedns.afraid.org/ and https://www.noip.com/ but many are availab
 
 Enable your NextCloud server to accept some domain names :
 
-	sudo geany /var/www/NextCloud/config/config.php
+	sudo geany /var/www/nextcloud/config/config.php
 
 Change :
   'trusted_domains' => 
@@ -363,7 +387,7 @@ Click Overview in the left pane and the message does not show anymore.
 
 2)----- You are accessing your instance over a secure connection, however your instance is generating insecure URLs. This most likely means that you are behind a reverse proxy and the overwrite config variables are not set correctly. Please read the documentation page about this ↗.
 
-	sudo geany /var/www/NextCloud/config/config.php &
+	sudo geany /var/www/nextcloud/config/config.php &
 
   'overwriteprotocol' => 'https',
 
@@ -396,9 +420,9 @@ Now change the NextCloud.conf :
 
 	sudo geany /etc/apache2/sites-available/NextCloud.conf &
 see :
-Alias /NextCloud "/var/www/NextCloud/"
+Alias /NextCloud "/var/www/nextcloud/"
 
-<Directory /var/www/NextCloud/>
+<Directory /var/www/nextcloud/>
   Require all granted
   AllowOverride All
   Options FollowSymLinks MultiViews
@@ -418,9 +442,9 @@ change it to :
   ServerAlias domain.name.one
   ServerAlias domain.name.two
 
-    Alias /NextCloud "/var/www/NextCloud/"
+    Alias /NextCloud "/var/www/nextcloud/"
 
-    <Directory /var/www/NextCloud/>
+    <Directory /var/www/nextcloud/>
       Require all granted
       AllowOverride All
       Options FollowSymLinks MultiViews
@@ -512,7 +536,7 @@ Go to Administration settings, Basic Settings on the left, fill in details and t
 
 7)----- Your installation has no default phone region set
 
-sudo geany /var/www/NextCloud/config/config.php
+sudo geany /var/www/nextcloud/config/config.php
 
 add :',
   'default_phone_region' => 'NL',
@@ -532,7 +556,7 @@ phpenmod -v 8.1 apcu
 geany /var/www/nextcloud/config/config.php :
 
 Add :
-  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'memcache.local' => '\OC\Memcache\APCu',
 
 /etc/php/8.1/apache2/php.ini
 
@@ -561,7 +585,12 @@ APCu is disabled by default on CLI which could cause issues with NextCloud’s c
 Please make sure you set the apc.enable_cli to 1 on your php.ini config file or 
 append --define apc.enable_cli=1 to the cron job call.
 
-I needed both so it is also in the crontab :
+Whoopsie, the location of apc.enable_cli=1 is in /etc/php/8.1/mods-available/apcu.ini which now has 2 lines only :
+extension=apcu.so
+apc.enable_cli=1
+( Thanks to Reiner_Nippes in https://help.nextcloud.com/t/occ-wont-run-with-memcache-apcu/119724/6 )
+
+I do not need --define apc.enable_cli=1 in the crontab job like I did before :
 
 crontab -u www-data -l
 
@@ -574,12 +603,12 @@ crontab -u www-data -l
 # 
 # m h  dom mon dow   command
 #
-#0  12  *  *  * php -f /var/www/NextCloud/cron.php --define apc.enable_cli=1
-0  12  *  *  * php8.1 -f /var/www/NextCloud/cron.php --define apc.enable_cli=1
+#0  12  *  *  * php -f /var/www/nextcloud/cron.php --define apc.enable_cli=1
+0  12  *  *  * php -f /var/www/nextcloud/cron.php
 
 To stay green I would need to run the job every 5 minutes like :
 
-*/5  *  *  *  * php8.1 -f /var/www/NextCloud/cron.php --define apc.enable_cli=1
+*/5  *  *  *  * php -f /var/www/nextcloud/cron.php
 
 
 9)----- The PHP module "imagick" is not enabled although the theming app is. For favicon generation to work correctly, you need to install and enable this module.
