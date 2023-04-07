@@ -2,7 +2,7 @@ Below are my notes on installing NextCloud and solving all issues on the Adminis
 
 Starting situation is a Raspberry Pi 4 running a clean installation of Bullseye.
 
-Installation was started using https://pimylifeup.com/raspberry-pi-NextCloud-server/ which was missing at the end to change port 80 to 443
+Installation was started using https://pimylifeup.com/raspberry-pi-NextCloud-server/ which was missing at the end to change port 80 to 443.
 
 My notes below has this in it.
 
