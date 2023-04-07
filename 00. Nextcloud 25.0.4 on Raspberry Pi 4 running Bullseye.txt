@@ -2,14 +2,13 @@ Below are my notes on installing NextCloud and solving all issues on the Adminis
 
 Starting situation is a Raspberry Pi 4 running a clean installation of Bullseye.
 
-Installation was started using https://pimylifeup.com/raspberry-pi-NextCloud-server/ where some things were missing.
+Installation was started using https://pimylifeup.com/raspberry-pi-NextCloud-server/ which was missing at the end to change port 80 to 443
 
-My notes below have these missing things in it.
+My notes below has this in it.
 
 Install mariadb, apache, php and NextCloud.
 
 After this check the Overview on the Administration page and solve all issues to beome green.
-
 
 ----- Installation
 
@@ -80,8 +79,6 @@ Initial creation of Virtual host
 
 	sudo geany /etc/apache2/sites-available/NextCloud.conf &
 
-(Note the line with the Alias, this was not there on https://pimylifeup.com/raspberry-pi-NextCloud-server/ )
-
 <VirtualHost *:80>
   DocumentRoot /var/www/nextcloud/
   ServerName 192.168.2.4
@@ -89,8 +86,6 @@ Initial creation of Virtual host
 #  ServerAlias veraart.onthewifi.com
 #  ServerAlias veraart.thehomeserver.net
   
-  Alias /NextCloud "/var/www/nextcloud/"
-
   <Directory /var/www/nextcloud/>
     Require all granted
     AllowOverride All
@@ -111,7 +106,7 @@ Activate the virtual host :
 
 Logon to NextCloud to create management account and configuration on the Raspberry Pi :
 
-	http://192.168.2.4/NextCloud
+	http://192.168.2.4/
 
 	NextCloudMgt
 	password for management account
@@ -238,7 +233,7 @@ Should be redirected to https.
 
 https://pimylifeup.com/raspberry-pi-NextCloud-server/ does not mention that you have to change the port 80 of the virtualhost to 443.
 
-Now change port 80 in /etc/apache2/sites-available/NextCloud.conf to 443 and browse to http://192.168.2.4/NextCloud
+Now change port 80 in /etc/apache2/sites-available/NextCloud.conf to 443 and browse to http://192.168.2.4/
 
 ------------- php info
 
@@ -341,7 +336,7 @@ Here are the issues I ran into right after installation and some other things.
 
 Logon to your NextCloud website. 
 
-https://veraart.onthewifi.com/NextCloud/index.php/settings/admin/overview
+https://veraart.onthewifi.com/index.php/settings/admin/overview
 
 Add a second account as admin account. (just to be sure)
 
@@ -420,7 +415,6 @@ Now change the NextCloud.conf :
 
 	sudo geany /etc/apache2/sites-available/NextCloud.conf &
 see :
-Alias /NextCloud "/var/www/nextcloud/"
 
 <Directory /var/www/nextcloud/>
   Require all granted
@@ -441,8 +435,6 @@ change it to :
   ServerAlias localhost
   ServerAlias domain.name.one
   ServerAlias domain.name.two
-
-    Alias /NextCloud "/var/www/nextcloud/"
 
     <Directory /var/www/nextcloud/>
       Require all granted
@@ -502,8 +494,6 @@ Now it looks like :
   RewriteEngine On
   RewriteRule ^(.*/\.well-known/carddav)$ https://%{HTTP_HOST}/NextCloud/remote.php/dav [R=301,L]
   RewriteRule ^(.*/\.well-known/caldav)$ https://%{HTTP_HOST}/NextCloud/remote.php/dav [R=301,L]
-
-    Alias /NextCloud "/var/www/html/NextCloud/"
 
     <Directory /var/www/html/NextCloud/>
       Require all granted
