@@ -6,7 +6,7 @@ All solutions to the issues I had right after finishing the installation are in 
 
 Issues solved during upgrades and previous installations are in other documents in the old notes folder.
 
-Currently running 25.0.6
+Current version Nextcloud Hub 4 (26.0.1)
 
 Issues solved in new setup :
 
