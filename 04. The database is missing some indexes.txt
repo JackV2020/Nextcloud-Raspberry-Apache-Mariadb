@@ -1,0 +1,11 @@
+----- The database is missing some indexes
+
+The database is missing some indexes. Due to the fact that adding indexes on big tables could take some time they were not added automatically. 
+By running "occ db:add-missing-indices" those missing indexes could be added manually while the instance keeps running. 
+Once the indexes are added queries to those tables are usually much faster.
+
+Note that the message indicates that this can be done online so :
+    
+    sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
+    
+Click Overview in the left pane and the message does not show anymore.

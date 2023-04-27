@@ -1,0 +1,10 @@
+----- When editing a text file on laptop this does not work on Android anymore
+
+When opening txt file on Android : "The document was saved outside the editor. The changes could not be applied."
+
+See https://github.com/nextcloud/android/issues/11508
+
+What works is first on my phone : sharing the file, saving it somewhere, delete from Nexcloud local and server version,
+Synchronise my latop so it is deleted.
+After this upload the saved file on my phone into the same location in Nextcloud.
+Other laptopts which were down during this pick up the new file when started so no sync issues there.

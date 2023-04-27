@@ -6,7 +6,9 @@ All solutions to the issues I had right after finishing the installation are in 
 
 Issues solved during upgrades and previous installations are in other documents in the old notes folder.
 
-New issues solved :
+Currently running 25.0.6
+
+Issues solved in new setup :
 
 sudo -u www-data php /var/www/nextcloud/occ anything
 
@@ -16,5 +18,7 @@ An unhandled exception has been thrown:<br>
 OCP\HintException: [0]: Memcache \OC\Memcache\APCu not available for local cache (Is the matching PHP module installed and enabled?)
 
     01. Fix Error Memcache  OC\Memcache\APCu not available
-
+    02. Android - The document was saved outside the editor
+    03. Fix resolve carddav and caldav
+    04. The database is missing some indexes
 

@@ -1,0 +1,55 @@
+----- Security & setup warnings on caldav and carddav
+
+In your administration overview you see :
+
+    Your web server is not properly set up to resolve "/.well-known/caldav". Further information can be found in the documentation.
+    Your web server is not properly set up to resolve "/.well-known/carddav". Further information can be found in the documentation.
+    
+Add the next lines in your /etc/apache2/sites-available/nextcloud.conf
+
+  RewriteEngine On
+  RewriteRule ^(.*/\.well-known/carddav)$ https://%{HTTP_HOST}/nextcloud/remote.php/dav [R=301,L]
+  RewriteRule ^(.*/\.well-known/caldav)$ https://%{HTTP_HOST}/nextcloud/remote.php/dav [R=301,L]
+
+Or since I have no Alias to /var/www/nextcloud/ anymore ( to solve the security host prefix issue on https://scan.nextcloud.com/ )
+
+  RewriteEngine On
+  RewriteRule ^(.*/\.well-known/carddav)$ https://%{HTTP_HOST}/remote.php/dav [R=301,L]
+  RewriteRule ^(.*/\.well-known/caldav)$ https://%{HTTP_HOST}/remote.php/dav [R=301,L]
+
+So my config looks now like :
+
+<VirtualHost *:443>
+  DocumentRoot /var/www/nextcloud/
+  ServerName  192.168.2.4
+  ServerAlias localhost
+  ServerAlias veraart.onthewifi.com
+  ServerAlias veraart.thehomeserver.net
+
+  RewriteEngine On
+  RewriteRule ^(.*/\.well-known/carddav)$ https://%{HTTP_HOST}/remote.php/dav [R=301,L]
+  RewriteRule ^(.*/\.well-known/caldav)$ https://%{HTTP_HOST}/remote.php/dav [R=301,L]
+
+# found on https://help.nextcloud.com/t/security-host-prefix-how-to-fix/30956/10
+#  Alias /nextcloud "/var/www/nextcloud/"
+
+  <Directory /var/www/nextcloud/>
+    Require all granted
+    AllowOverride All
+    Options FollowSymLinks MultiViews
+
+    <IfModule mod_dav.c>
+      Dav off
+    </IfModule>
+     
+  </Directory>
+    <IfModule mod_headers.c>
+      Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+    </IfModule>
+
+Include /etc/letsencrypt/options-ssl-apache.conf
+SSLCertificateFile /etc/letsencrypt/live/veraart.onthewifi.com/fullchain.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/veraart.onthewifi.com/privkey.pem
+</VirtualHost>
+
+
