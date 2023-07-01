@@ -64,3 +64,7 @@ array (
 I do not think the next is neseccary :
 
 sudo systemctl restart apache2
+
+The next command shows redis info:
+
+php --ri redis
