@@ -1,0 +1,66 @@
+----- The database is used for transactional file locking.
+
+The database is used for transactional file locking. To enhance performance, please configure memcache, if available. See the documentation :arrow_upper_right: for more information.
+
+I added Redis in socket mode.
+
+sudo apt update
+sudo apt upgrade
+sudo apt install redis-server php8.1-redis
+sudo phpenmod redis
+
+I changed the next lines in /etc/redis/redis.conf to prepare for socket mode:
+
+requirepass secret
+unixsocket /var/run/redis/redis-server.sock
+port 0
+unixsocketperm 760
+
+sudo systemctl restart redis
+
+Testing redis:
+
+First using user pi to receive an error which is just fine because pi has no rights to /run/redis/redis-server.sock
+redis-cli -a secret -s /run/redis/redis-server.sock ping
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+Could not connect to Redis at /run/redis/redis-server.sock: Permission denied
+
+From the root account after sudo -i
+
+redis-cli -a secret -s /run/redis/redis-server.sock ping
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+PONG
+
+use www-data to ping
+sudo -u www-data redis-cli -a secret -s /run/redis/redis-server.sock ping
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+PONG
+
+use www-data to create a value for test
+sudo -u www-data redis-cli -a secret -s /run/redis/redis-server.sock set test something
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+OK
+
+redis-cli -a secret -s /run/redis/redis-server.sock get test
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+“something”
+
+So far so good, this works but now get it to work for Nextcloud.
+
+End of /var/www/nextcloud/config/config.php
+
+‘filelocking.enabled’ => true,
+‘memcache.local’ => ‘\OC\Memcache\APCu’,
+‘memcache.locking’ => ‘\OC\Memcache\Redis’,
+‘redis’ =>
+array (
+‘host’ => ‘/var/run/redis/redis-server.sock’,
+‘port’ => 0,
+‘timeout’ => 0.0,
+‘password’ => ‘secret’,
+),
+);
+
+I do not think the next is neseccary :
+
+sudo systemctl restart apache2
