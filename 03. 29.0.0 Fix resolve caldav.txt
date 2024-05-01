@@ -1,0 +1,30 @@
+----- Security & setup warnings on caldav and carddav
+
+I had the fix in place like described in '03.Old Fix resolve carddav and caldav'
+
+After upgrade to 29.0.0 I see the next in the administration overview :
+
+    Your web server is not properly set up to resolve .well-known URLs, failed on: /.well-known/caldav
+    
+Since I have no Alias to /var/www/nextcloud/ anymore ( to solve the security host prefix issue on https://scan.nextcloud.com/ )
+I had the next in my /etc/apache2/sites-available/nextcloud.conf :
+
+  RewriteEngine On
+  RewriteRule ^(.*/\.well-known/carddav)$ https://%{HTTP_HOST}/remote.php/dav [R=301,L]
+  RewriteRule ^(.*/\.well-known/caldav)$ https://%{HTTP_HOST}/remote.php/dav [R=301,L]
+
+Now I disabled these and put the next in /var/www/nextcloud/.htaccess :
+
+<IfModule mod_rewrite.c>
+  RewriteEngine on
+  RewriteCond %{HTTP_USER_AGENT} DavClnt
+  RewriteRule ^$ /remote.php/webdav/ [L,R=302]
+  RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+  RewriteRule ^\.well-known/carddav /remote.php/dav/ [R=301,L]
+  RewriteRule ^\.well-known/caldav /remote.php/dav/ [R=301,L]
+  RewriteRule ^remote/(.*) remote.php [QSA,L]
+  RewriteRule ^(?:build|tests|config|lib|3rdparty|templates)/.* - [R=404,L]
+  RewriteRule ^\.well-known/(?!acme-challenge|pki-validation) /index.php [QSA,L]
+  RewriteRule ^ocm-provider/?$ index.php [QSA,L]
+  RewriteRule ^(?:\.(?!well-known)|autotest|occ|issue|indie|db_|console).* - [R=404,L]
+</IfModule>

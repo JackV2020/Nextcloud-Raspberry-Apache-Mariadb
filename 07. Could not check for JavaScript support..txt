@@ -1,0 +1,43 @@
+----- Could not check for JavaScript support.
+
+Error : Could not check for JavaScript support. Please check manually if your webserver serves `.mjs` files using the JavaScript MIME type.
+
+Found some things below but in the end when I do not access /index.php/settings/admin/overview by ip address but by public domain name the error is not there :-)
+
+So I will ignore it. even though there is somewhere in the next pages that they added 
+
+
+https://github.com/nextcloud/server/issues/42989
+
+found on :
+
+https://help.nextcloud.com/t/rc5-of-nextcloud-28-0-2/180292/8
+
+Firefox https://veraart.thehomeserver.net/apps/settings/js/esm-test.mjs
+/**
+ * This is a dummy file for testing webserver support of JavaScript modules.
+ */
+
+export default 'Hello'
+
+
+curl -I https://veraart.thehomeserver.net/apps/settings/js/esm-test.mjs
+HTTP/1.1 200 OK
+Date: Fri, 02 Feb 2024 16:54:08 GMT
+Server: Apache/2.4.56 (Debian)
+Strict-Transport-Security: max-age=15552000; includeSubDomains
+Referrer-Policy: no-referrer
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-Robots-Tag: noindex, nofollow
+X-XSS-Protection: 1; mode=block
+Last-Modified: Fri, 02 Feb 2024 09:52:18 GMT
+ETag: "6d-610631148c95e"
+Accept-Ranges: bytes
+Content-Length: 109
+Vary: Accept-Encoding
+Cache-Control: max-age=15778463
+Content-Type: text/javascript
+
+

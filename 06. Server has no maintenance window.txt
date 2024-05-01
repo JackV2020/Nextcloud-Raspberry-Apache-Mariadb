@@ -1,0 +1,7 @@
+----- Server has no maintenance window start time configured.
+
+
+Add the next to \var\www\nextcloud\config\config.php
+
+
+  'maintenance_window_start'  =>  1,
