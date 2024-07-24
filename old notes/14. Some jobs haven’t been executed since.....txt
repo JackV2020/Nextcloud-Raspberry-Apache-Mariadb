@@ -1,6 +1,6 @@
 ----- Some jobs haven’t been executed since.....
 
-Better to look in document '18. Background job ran long time ago'
+Also to look in document '18. Background job ran long time ago'
 
 Background jobs
 
@@ -17,8 +17,17 @@ I could see that using the nesxt command :
     
     watch "ps -ef | grep nextcloud"
 
-So I changed it to run once a day at 07:00 AM :
+Every 2.0s: ps -ef | grep nextcloud
 
-0  7  *  *  * php -f /var/www/nextcloud/cron.php
+www-data  265621  265610  0 20:35 ?        00:00:00 /bin/sh -c php -f /var/www/nextcloud/cron.php
+www-data  265623  265621 76 20:35 ?        00:00:41 php -f /var/www/nextcloud/cron.php
+root      265998  263509  0 20:35 pts/0    00:00:00 watch -n 10 ps -ef | grep nextcloud
+root      265999  265998  0 20:35 pts/0    00:00:00 watch -n 10 ps -ef | grep nextcloud
+root      266000  265999  0 20:35 pts/0    00:00:00 sh -c ps -ef | grep nextcloud
+root      266002  266000  0 20:35 pts/0    00:00:00 grep nextcloud
+
+So I changed it to run once a day at 08:00 AM :
+
+0  8  *  *  * php -f /var/www/nextcloud/cron.php
 
 I may decrease the interval in future but at this moment just once a day.

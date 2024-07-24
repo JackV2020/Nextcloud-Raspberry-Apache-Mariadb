@@ -30,4 +30,17 @@ Later found a warning in the Nextcloud docu where cache setup is explained :
     Please make sure you set the apc.enable_cli to 1 on your php.ini config file or append
     --define apc.enable_cli=1 to the cron job call.
 
-So the fix is fine 8-)
+the next runs fine now :
+
+0  8  *  *  * php -f /var/www/nextcloud/cron.php
+
+/etc/php/8.1# grep -rin . -e enable_cli
+./mods-available/apcu.ini:2:apc.enable_cli=1
+./cli/php.ini:1776:;opcache.enable_cli=0
+./cli/php.ini.ucf-dist:1780:;opcache.enable_cli=0
+./apache2/php.ini:1779:opcache.enable_cli=1
+./apache2/php.ini:1796:;opcache.enable_cli=0
+./apache2/php.ini:1978:apc.enable_cli = 1
+./apache2/php.ini.ucf-dist:1780:;opcache.enable_cli=0
+
+

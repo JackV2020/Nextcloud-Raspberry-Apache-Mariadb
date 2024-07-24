@@ -1,0 +1,21 @@
+----- opcache.interned_strings_buffer
+
+Occured for the first time after upgrade to 29.0.3 and later after upgrade to 29.0.4
+
+The PHP OPcache module is not properly configured. The OPcache interned strings buffer is nearly full. To assure that repeating strings can be effectively cached, it is recommended to apply "opcache.interned_strings_buffer" to your PHP configuration with a value higher than "8".. For more details see the documentation ↗.
+link:
+https://docs.nextcloud.com/server/29/admin_manual/installation/server_tuning.html#enable-php-opcache
+
+Found nothing on that page so searched in the docu (left top) on interned_strings_buffer:
+
+https://docs.nextcloud.com/server/29/admin_manual/installation/example_openbsd.html
+
+There is an example with 'opcache.interned_strings_buffer=8'
+
+https://help.nextcloud.com/t/nextcloud-23-02-opcache-interned-strings-buffer/134007
+
+refers to :
+https://gist.github.com/rohankhudedev/1a9c0a3c7fb375f295f9fc11aeb116fe
+
+But also mentions restart so just restarted apache2, refreshed screen message gone
+

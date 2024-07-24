@@ -4,9 +4,9 @@ My last installation is in '00. Nextcloud 25.0.4 on Raspberry Pi 4 running Bulls
 
 All solutions to the issues I had right after finishing the installation are in that document.
 
-Issues solved during upgrades and previous installations are in other documents in the old notes folder.
+Issues solved during installations and upgrades before 25.0.4 are in other documents in the old notes folder.
 
-Current version Nextcloud is 29.0.0
+Current version Nextcloud is 29.0.4
 
 Issues after last installation:
 
@@ -18,4 +18,4 @@ Issues after last installation:
     05. The database is used for transactional file locking
     06. Server has no maintenance window
     07. Could not check for JavaScript support.
-
+    08. opcache.interned_strings_buffer
