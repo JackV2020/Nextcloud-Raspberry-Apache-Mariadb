@@ -6,7 +6,7 @@ All solutions to the issues I had right after finishing the installation are in 
 
 Issues solved during installations and upgrades before 25.0.4 are in other documents in the old notes folder.
 
-Current version Nextcloud is 29.0.4
+Current version Nextcloud is 29.0.5
 
 Issues after last installation:
 
@@ -19,3 +19,4 @@ Issues after last installation:
     06. Server has no maintenance window
     07. Could not check for JavaScript support.
     08. opcache.interned_strings_buffer
+    09. Mimetype Migration Issue After Updating to 29.0.5

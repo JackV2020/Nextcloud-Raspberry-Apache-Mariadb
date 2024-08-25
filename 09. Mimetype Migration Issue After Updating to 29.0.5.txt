@@ -1,0 +1,34 @@
+----- 09. Mimetype Migration Issue After Updating to 29.0.5
+
+One or more mimetype migrations are available. Occasionally new mimetypes are added to better handle certain file types. Migrating the mimetypes take a long time on larger instances so this is not done automatically during upgrades. Use the command `occ maintenance:repair --include-expensive` to perform the migrations.
+
+I ran the command:
+
+sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
+
+but the message did not go away.
+
+Found the next link: https://help.nextcloud.com/t/mimetype-migration-issue-after-updating-to-29-0-5/201318
+
+sudo -i
+
+Edit cd/var/www/nextcloud/lib/private/Repair/RepairMimeTypes.php
+
+Search for 30.0.0.0 and find 1 occurence.
+
+Change that to 29.0.5.0, save file, refresh browser, message gone, issue still there?
+
+Found other command :
+
+sudo -u www-data php /var/www/nextcloud/occ integrity:check-core
+
+  - INVALID_HASH:
+    - lib/private/Repair/RepairMimeTypes.php:
+      - expected: cbe37950a516bdaa081a318a5ea934c424c4fcd16d8690efdfa68a09241c553cdb41f3994a451dd20d69d15a6525f988e3fcb3668e8fb50f6f9afd60bc0aa9d1
+      - current: 1e88dcb09eeb47ad50485ff0eeb6483ee36607c14c409595a690ecf12f7b30ae9309b801a732187596eb717e2fd55f77c0588e8e3696e4878787329a7b922412
+
+Changed back to  30.0.0.0
+
+sudo -u www-data php /var/www/nextcloud/occ integrity:check-core
+
+no issue, but message is back plus an integrity issue message which contains an option to rescan. Clicked the rescan and the integrity issue was gone.

@@ -6,7 +6,8 @@ In the logging you may see a message like : Trash bin: AbstractTrash::getSize() 
 
 To fix this I did the next but do not do that anymore. ( What I do is 1 line further below )
 
-sudo -u www-data php /var/www/html/nextcloud/occ trashbin:cleanup usernameofuserwithissue
+sudo -u www-data php /var/www/nextcloud/occ trashbin:cleanup usernameofuserwithissue
+sudo -u www-data php /var/www/nextcloud/occ trashbin:cleanup --all-users
 
 
 To fix this 'permanently' I do the next after every upgrade (using info from error: AbstractTrash::getSize() ) :
