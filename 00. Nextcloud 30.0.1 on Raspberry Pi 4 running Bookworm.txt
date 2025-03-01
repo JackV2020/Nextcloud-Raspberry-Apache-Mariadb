@@ -1,0 +1,1271 @@
+Below are my notes on installing NextCloud and solving all issues on the Administration settings Overview page.
+
+Starting situation is a Raspberry Pi 4 running a clean installation of Bookworm.
+
+Installation was started using https://pimylifeup.com/raspberry-pi-NextCloud-server/ which was missing at the end to change port 80 to 443.
+
+My notes below has this in it.
+
+Install mariadb, apache, php and NextCloud.
+
+After this check the Overview on the Administration page and solve all issues to become green.
+
+----- Installation
+
+Start a terminal as user pi and install apache :
+
+	sudo apt update
+	sudo apt upgrade -y
+
+	sudo apt install apache2
+
+Start a browser and check to see http://localhost/
+
+
+PHP 8.3 : 
+https://php.watch/articles/php-8.3-install-upgrade-on-debian-ubuntu
+
+# Save existing php package list to packages.txt file
+skipped : sudo dpkg -l | grep php | tee packages.txt
+
+# Add Ondrej's repo source and signing key along with dependencies
+sudo apt install apt-transport-https
+sudo curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
+sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+sudo apt update
+
+# Install new PHP 8.3 packages
+sudo apt install php8.3 php8.3-cli php8.3-{bz2,curl,mbstring,intl}
+
+PLUS :
+
+sudo apt install php8.3 php8.3-gd php8.3-sqlite3 php8.3-curl php8.3-zip php8.3-xml php8.3-mbstring php8.3-mysql php8.3-bz2 php8.3-intl php8.3-smbclient php8.3-imap php8.3-gmp php8.3-bcmath libapache2-mod-php8.3
+FROM sudo apt install php8.2 php8.2-gd php8.2-sqlite3 php8.2-curl php8.2-zip php8.2-xml php8.2-mbstring php8.2-mysql php8.2-bz2 php8.2-intl php8.2-smbclient php8.2-imap php8.2-gmp php8.2-bcmath libapache2-mod-php8.2
+
+
+# Install FPM OR Apache module
+skipped because done above: sudo apt install php8.3-fpm
+# OR
+# sudo apt install libapache2-mod-php8.3
+
+# On Apache: Enable PHP 8.3 FPM
+skipped because not installed: sudo a2enconf php8.3-fpm
+# When upgrading from an older PHP version:
+skipped because new install: sudo a2disconf php8.2-fpm
+
+# Remove old packages
+sudo apt purge php8.2*
+Removed nothing because nothing was installed
+
+
+sudo service apache2 restart
+
+It is good to have some info on php like the name of your config file.
+
+sudo geany /var/www/html/info.php
+
+<?php
+phpinfo();
+?>
+
+save file
+
+Start a browser to http://localhost/info.php
+
+Should be redirected to https and gives info like : 
+
+row 7 :	Loaded Configuration File 	/etc/php/8.3/apache2/php.ini 
+
+------------------------------------------------------------------------
+Install mariadb :
+https://mariadb.com/downloads/
+download mariadb-11.4.3-debian-bookworm-arm64-debs.ta
+put the file on the Raspberry Pi in /opt
+sudo -i
+cd /opt
+tar -xvf mariadb-11.4.3-debian-bookworm-arm64-debs.tar
+read README but do this to get it done:
+cd mariadb-11.4.3-debian-bookworm-arm64-debs
+./setup_repository
+
+cat /etc/apt/sources.list.d/mariadb.list
+deb file:///opt/mariadb-11.4.3-debian-bookworm-arm64-debs ./
+
+apt-get update && apt-get install mariadb-server
+
+-----------------------------
+MariaDB Server 
+
+This package contains a number of .deb files that together comprise the MariaDB
+Server distribution.
+
+The packages included in this archive may vary depending on the OS you're using
+and its release version, as different components may require libraries or
+functionality available only in newer releases. 
+
+The .deb files can be installed individually, but there are complex
+interdependencies that are difficult to resolve using dpkg alone. For that
+reason, this package is distributed as a ready-to-use Debian archive, so that
+you can use apt to install the packages in it.
+
+In order for the package manager to be able to install these packages, you will
+need to place them in a location that the package manager has privileges to
+access. You may find that /opt is a good location where you can unpack the
+archive and the package manager will be able to read it.
+
+To use the archive with apt, create a mariadb.list file in
+/etc/apt/sources.list.d/ that points to the directory where you've extracted
+the files. A helpful script called setup_repository is included in this archive
+to do this for you.
+
+You'll need to do this work as root, so that you can write files to these
+locations.
+
+cd /opt
+tar -xf ~/mariadb-11.4.3-debian-bookworm-arm64-debs.tar
+mariadb-11.4.3-debian-bookworm-arm64-debs/setup_repository
+
+After the repository is set up, you should update apt and install the
+mariadb-server package.
+
+apt-get update && apt-get install mariadb-server
+
+If your operating system already provides its own MariaDB packages, you may
+need to manually specify the version of the package you've downloaded. Version
+numbers can be complicated, so you may wish to use a command such as this to
+see all available versions, from which you can choose one:
+
+# apt-cache show mariadb-server | grep Version
+Version: 10.1.17+maria-1~xenial
+Version: 10.0.27+maria-1~xenial
+Version: 10.0.25-0ubuntu0.16.04.1
+Version: 10.0.24-7
+# apt-get install mariadb-server=10.0.27+maria-1~xenial
+
+For more information about installing MariaDB .deb files, visit:
+https://mariadb.com/kb/en/installing-mariadb-deb-files/
+
+For more information about MariaDB products, visit https://mariadb.com/products
+and for help using MariaDB, please contact MariaDB Corporation:
+https://mariadb.com/contact
+
+-----------------------------
+
+------------------------------------------------------------------------
+
+Install mariadb :
+
+	sudo apt install mariadb-server
+
+	sudo mysql_secure_installation
+	
+	/usr/bin/mysql_secure_installation: Deprecated program name. It will be removed in a future release, use 'mariadb-secure-installation' instead
+	
+	Ctrl-C
+	
+	sudo mariadb-secure-installation
+	
+	enter
+	Y all the time
+	password S......
+	password S......
+	enter enter until ......
+	Thanks for using MariaDB!
+
+Create database :
+
+	sudo mysql -u root -p
+
+mysql: Deprecated program name. It will be removed in a future release, use '/usr/bin/mariadb' instead
+
+	Ctrl-C, enter, Ctrl-D to get out
+	
+	sudo mariadb -u root -p
+
+	CREATE DATABASE NextClouddb;
+	CREATE USER 'NextClouduser'@'localhost' IDENTIFIED BY 'S....';
+	GRANT ALL PRIVILEGES ON NextClouddb.* TO 'NextClouduser'@'localhost';
+	FLUSH PRIVILEGES;
+	quit;
+
+
+Install NextCloud (which was 30.0.1 at the time of installation):
+
+	cd /var/www/
+	sudo wget https://download.NextCloud.com/server/releases/latest.tar.bz2
+
+	sudo tar -xvf latest.tar.bz2
+
+	sudo chown -R www-data:www-data /var/www/nextcloud/
+
+I have an USB disk mounted on /mnt/Share0 and this is where I will put the NextCloud data :
+
+	sudo mkdir /mnt/Share0/NextCloud
+
+	sudo chown -R www-data:www-data /mnt/Share0/NextCloud
+
+	sudo chmod 750 /mnt/Share0/NextCloud
+
+
+Initial creation of Virtual host 
+( modified several times later to solve issues or add functionality ) :
+( geany is my favorite editor)
+
+	sudo geany /etc/apache2/sites-available/NextCloud.conf &
+
+<VirtualHost *:80>
+  DocumentRoot /var/www/nextcloud/
+  ServerName 192.168.2.4
+#  ServerAlias localhost
+#  ServerAlias veraart.onthewifi.com
+#  ServerAlias veraart.thehomeserver.net
+  
+  <Directory /var/www/nextcloud/>
+    Require all granted
+    AllowOverride All
+    Options FollowSymLinks MultiViews
+
+    <IfModule mod_dav.c>
+      Dav off
+    </IfModule>
+  </Directory>
+</VirtualHost>
+
+save file
+
+Activate the virtual host :
+
+	sudo a2ensite NextCloud.conf
+	sudo systemctl reload apache2
+
+Logon to NextCloud to create management account and configuration on the Raspberry Pi :
+
+	http://192.168.2.4/
+
+	NextCloudMgt
+	password for management account
+    open 'Storage & database'
+	/mnt/Share0/NextCloud
+    MySQL/MariaDB
+	NextClouduser
+	password for db user S....
+	NextClouddb
+	localhost
+
+I did not install recommended apps because I just want to sync files
+(Calendar, Contacts, Mail, Nextcloud Office, Notes, Talk)
+Wait to be logged on to your NextCloud website.
+
+Read welcome info or click cross/close top right corner to close the message.
+
+Click circle image with letter N in it in the top right corner.
+
+Click Administration Setting.
+Click Overview in the left pane.
+See lots of messages to be dealt with later. This is the page where we want to see a green mark indicating the configuration is fine.
+We are running Version NextCloud Hub 9 (30.0.1)
+
+----- oud 25.0.....
+
+The PHP memory limit is below the recommended value of 512MB.
+Accessing site insecurely via HTTP. You are strongly advised to set up your server to require HTTPS instead, as described in the security tips ↗.
+Your web server is not properly set up to resolve "/.well-known/webfinger". Further information can be found in the documentation ↗.
+Your web server is not properly set up to resolve "/.well-known/nodeinfo". Further information can be found in the documentation ↗.
+Your web server is not properly set up to resolve "/.well-known/caldav". Further information can be found in the documentation ↗.
+Your web server is not properly set up to resolve "/.well-known/carddav". Further information can be found in the documentation ↗.
+You have not set or verified your email server configuration, yet. Please head over to the Basic settings in order to set them. Afterwards, use the "Send email" button below the form to verify your settings.
+Your installation has no default phone region set. This is required to validate phone numbers in the profile settings without a country code. To allow numbers without a country code, please add "default_phone_region" with the respective ISO 3166-1 code ↗ of the region to your config file.
+No memory cache has been configured. To enhance performance, please configure a memcache, if available. Further information can be found in the documentation ↗.
+The PHP module "imagick" is not enabled although the theming app is. For favicon generation to work correctly, you need to install and enable this module.
+
+----- nieuw 30.0.1.....
+
+There are some errors regarding your setup.
+
+    Accessing site insecurely via HTTP. You are strongly advised to set up your server to require HTTPS instead. Without it some important web functionality like "copy to clipboard" or "service workers" will not work! For more details see the documentation ↗.
+    The PHP memory limit is below the recommended value of 512 MB.
+
+    Your web server is not properly set up to resolve `.well-known` URLs, failed on: `/.well-known/caldav` For more details see the documentation ↗.
+    Server has no maintenance window start time configured. This means resource intensive daily background jobs will also be executed during your main usage time. We recommend to set it to a time of low usage, so users are less impacted by the load caused from these heavy tasks. For more details see the documentation ↗.
+    One or more mimetype migrations are available. Occasionally new mimetypes are added to better handle certain file types. Migrating the mimetypes take a long time on larger instances so this is not done automatically during upgrades. Use the command `occ maintenance:repair --include-expensive` to perform the migrations.
+    Some headers are not set correctly on your instance - The `Strict-Transport-Security` HTTP header is not set (should be at least `15552000` seconds). For enhanced security, it is recommended to enable HSTS. For more details see the documentation ↗.
+    Detected some missing optional indices. Occasionally new indices are added (by Nextcloud or installed applications) to improve database performance. Adding indices can sometimes take awhile and temporarily hurt performance so this is not done automatically during upgrades. Once the indices are added, queries to those tables should be faster. Use the command `occ db:add-missing-indices` to add them. Missing indices: "systag_by_objectid" in table "systemtag_object_mapping". For more details see the documentation ↗.
+    The PHP OPcache module is not properly configured. The OPcache interned strings buffer is nearly full. To assure that repeating strings can be effectively cached, it is recommended to apply "opcache.interned_strings_buffer" to your PHP configuration with a value higher than "8".. For more details see the documentation ↗.
+
+    The database is used for transactional file locking. To enhance performance, please configure memcache, if available. For more details see the documentation ↗.
+    No memory cache has been configured. To enhance performance, please configure a memcache, if available. For more details see the documentation ↗.
+    Your installation has no default phone region set. This is required to validate phone numbers in the profile settings without a country code. To allow numbers without a country code, please add "default_phone_region" with the respective ISO 3166-1 code of the region to your config file. For more details see the documentation ↗.
+    You have not set or verified your email server configuration, yet. Please head over to the "Basic settings" in order to set them. Afterwards, use the "Send email" button below the form to verify your settings. For more details see the documentation ↗.
+    The PHP module "imagick" is not enabled although the theming app is. For favicon generation to work correctly, you need to install and enable this module. For more details see the documentation ↗.
+
+Please double check the installation guides ↗, and check for any errors or warnings in the log.
+
+Check the security of your Nextcloud over our security scan ↗. 
+-----------------------
+
+We first do some other things :
+
+---------- Increasing NextCloud’s Max Upload Size
+
+sudo geany /etc/php/8.1/apache2/php.ini &
+Find :
+post_max_size = 8M
+upload_max_filesize = 2M
+Change :
+post_max_size = 21G
+upload_max_filesize = 20G
+
+I read that post_max_size should be larger than upload_max_filesize because of protocol overhead and that 
+files are not sent as they are but encoded to Base64 for transport which makes the total transport about 35% bigger than the original file.
+So the settings seem to be for 20GB but it is less.
+
+---------- Install ssl for apache
+
+Create folder :
+
+	sudo mkdir -p /etc/apache2/ssl
+
+Generate certificate valid for 3650 days :: 10 years
+
+	sudo openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt
+
+	Country Name (2 letter code) [AU]:NL
+	State or Province Name (full name) [Some-State]:Zeeland
+	Locality Name (eg, city) []:Tholen
+	Organization Name (eg, company) [Internet Widgits Pty Ltd]:Private
+	Organizational Unit Name (eg, section) []:Private
+	Common Name (e.g. server FQDN or YOUR name) []:Private
+	Email Address []:arealmailaddress@someprovider.somethingelse
+
+Enable ssl module :
+
+	sudo a2enmod ssl
+
+Configure apache for certificate :
+
+	sudo geany /etc/apache2/sites-available/default-ssl.conf &
+
+Change :
+
+SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem
+SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+
+to :
+
+SSLCertificateFile /etc/apache2/ssl/apache.crt
+SSLCertificateKeyFile /etc/apache2/ssl/apache.key
+
+Save file
+
+Enable default-ssl.conf :
+
+	sudo a2ensite default-ssl.conf
+	sudo service apache2 restart
+
+Start a webbrowser and check if it works : https://yourservernameoraddress/ and accept risk :-)
+
+
+
+Now force all traffic to apache to go to https :
+
+	sudo geany /etc/apache2/sites-available/000-default.conf
+
+Comment out all active lines by putting ##### in front and put next at top :
+( I use ##### so I can later see what I commented out extra to evrything else commented out already )
+
+<VirtualHost *:80>
+   ServerAdmin example@example
+
+   RewriteEngine On
+   RewriteCond %{HTTPS} off
+   RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+</VirtualHost>
+
+save file
+
+Enable rewrite module and restart apache :
+
+	sudo a2enmod rewrite
+To test we need :
+	sudo a2dissite Nextcloud
+
+	sudo service apache2 restart
+Start a webbrowser and check if it works : http://yourservernameoraddress/
+Should be redirected to https.
+
+https://pimylifeup.com/raspberry-pi-NextCloud-server/ does not mention that you have to change the port 80 of the virtualhost to 443.
+
+Now change port 80 in /etc/apache2/sites-available/NextCloud.conf to 443
+and include ssl config like :
+<VirtualHost *:443>
+  DocumentRoot /var/www/nextcloud/
+  ServerName 192.168.2.4
+#  ServerAlias localhost
+#  ServerAlias veraart.onthewifi.com
+#  ServerAlias veraart.thehomeserver.net
+#  ServerAlias veraart.duckdns.org
+#  ServerAlias veraart.mywire.org
+
+	#   SSL Engine Switch:
+	#   Enable/Disable SSL for this virtual host.
+	SSLEngine on
+
+	#   A self-signed (snakeoil) certificate can be created by installing
+	#   the ssl-cert package. See
+	#   /usr/share/doc/apache2/README.Debian.gz for more info.
+	#   If both key and certificate are stored in the same file, only the
+	#   SSLCertificateFile directive is needed.
+	#SSLCertificateFile      /etc/ssl/certs/ssl-cert-snakeoil.pem
+	#SSLCertificateKeyFile   /etc/ssl/private/ssl-cert-snakeoil.key
+	SSLCertificateFile      /etc/apache2/ssl/apache.crt
+	SSLCertificateKeyFile   /etc/apache2/ssl/apache.key
+  
+  <Directory /var/www/nextcloud/>
+    Require all granted
+    AllowOverride All
+    Options FollowSymLinks MultiViews
+
+    <IfModule mod_dav.c>
+      Dav off
+    </IfModule>
+  </Directory>
+</VirtualHost>
+
+
+	sudo a2ensite Nextcloud
+
+	sudo service apache2 restart
+	
+and browse to http://192.168.2.4/
+
+------------- php info
+
+Start a browser on the Raspberry Pi itself to http://localhost/info.php
+
+Should be redirected to https
+
+------------- php default version
+
+To set the default version for the php command you use the update-alternatives command :
+
+update-alternatives --display php
+
+shows some info including a link to the current version
+
+update-alternatives --display php
+php - auto mode
+  link best version is /usr/bin/php8.3
+  link currently points to /usr/bin/php8.3
+  link php is /usr/bin/php
+  slave php.1.gz is /usr/share/man/man1/php.1.gz
+/usr/bin/php8.3 - priority 83
+  slave php.1.gz: /usr/share/man/man1/php8.3.1.gz
+  
+  
+To change the version :
+
+update-alternatives --config php
+update-alternatives --config php
+There is 1 choice for the alternative php (providing /usr/bin/php).
+
+  Selection    Path             Priority   Status
+------------------------------------------------------------
+* 0            /usr/bin/php8.3   83        auto mode
+  1            /usr/bin/php8.3   83        manual mode
+
+Press <enter> to keep the current choice[*], or type selection number:
+
+Make the right choice here so all nextcloud related php cli commands by user www-data use the right version.
+I just entered because I have just 1 version.
+
+---------- Configure the ISP router
+
+You will need to port forward two ports to finally have NextCloud up and running. 
+These two ports being Port 80 and Port 443. 
+The protocol required for these is TCP.
+In my router I need to create  :
+	- an application for HTTP port 80 TCP
+	- an application for HTTPS port 443 TCP
+	- a forwarding for application HTTP to my Raspberry Pi
+	- a forwarding for application HTTPS to my Raspberry Pi
+
+Start a webbrowser and check if it works : http://yourpublicipaddressorhostname/
+Should be redirected to https.
+
+---------- Enable some domain names to prepare for access from Internet
+
+You want a domain name on the Internet. Free services are available for that.
+
+I use https://freedns.afraid.org/ and https://www.noip.com/ but many are available.
+
+Enable your NextCloud server to accept some domain names :
+
+	sudo geany /var/www/nextcloud/config/config.php
+
+Change :
+  'trusted_domains' => 
+  array (
+    0 => 'localhost',
+  ),
+
+
+To :
+
+ 'trusted_domains' => 
+  array (
+    0 => '1.2.3.4',
+    1 => 'localhost',
+    2 => 'domain.name.two',
+    3 => 'domain.name.etc',
+  ),
+
+Note that 1.2.3.4 is the address of your Raspberry Pi.
+
+Add the next in /etc/apache2/sites-available/NextCloud.conf
+
+  ServerAlias localhost
+  ServerAlias domain.name.two
+  ServerAlias domain.name.three
+
+systemctl restart apache2
+
+and we have access from the Internet.
+
+------------ solving issues :
+
+There are some errors regarding your setup.
+
+     1) The PHP memory limit is below the recommended value of 512 MB.
+
+     2) Server has no maintenance window start time configured. This means resource intensive daily background jobs will also be executed during your main usage time. We recommend to set it to a time of low usage, so users are less impacted by the load caused from these heavy tasks. For more details see the documentation ↗.
+     3) One or more mimetype migrations are available. Occasionally new mimetypes are added to better handle certain file types. Migrating the mimetypes take a long time on larger instances so this is not done automatically during upgrades. Use the command `occ maintenance:repair --include-expensive` to perform the migrations.
+     4) Some headers are not set correctly on your instance - The `Strict-Transport-Security` HTTP header is not set (should be at least `15552000` seconds). For enhanced security, it is recommended to enable HSTS. For more details see the documentation ↗.
+     5) Detected some missing optional indices. Occasionally new indices are added (by Nextcloud or installed applications) to improve database performance. Adding indices can sometimes take awhile and temporarily hurt performance so this is not done automatically during upgrades. Once the indices are added, queries to those tables should be faster. Use the command `occ db:add-missing-indices` to add them. Missing indices: "systag_by_objectid" in table "systemtag_object_mapping". For more details see the documentation ↗.
+     6) The PHP OPcache module is not properly configured. The OPcache interned strings buffer is nearly full. To assure that repeating strings can be effectively cached, it is recommended to apply "opcache.interned_strings_buffer" to your PHP configuration with a value higher than "8".. For more details see the documentation ↗.
+
+     7) 1 warning in the logs since October 18, 2024, 9:50:46 AM
+     8) The database is used for transactional file locking. To enhance performance, please configure memcache, if available. For more details see the documentation ↗.
+     9) No memory cache has been configured. To enhance performance, please configure a memcache, if available. For more details see the documentation ↗.
+    10) Your installation has no default phone region set. This is required to validate phone numbers in the profile settings without a country code. To allow numbers without a country code, please add "default_phone_region" with the respective ISO 3166-1 code of the region to your config file. For more details see the documentation ↗.
+    11) You have not set or verified your email server configuration, yet. Please head over to the "Basic settings" in order to set them. Afterwards, use the "Send email" button below the form to verify your settings. For more details see the documentation ↗.
+    12) The PHP module "imagick" is not enabled although the theming app is. For favicon generation to work correctly, you need to install and enable this module. For more details see the documentation ↗.
+
+Please double check the installation guides ↗, and check for any errors or warnings in the log.
+
+Check the security of your Nextcloud over our security scan ↗. 
+
+
+
+1)----- The PHP memory limit is below the recommended value of 512MB.
+
+	sudo geany /etc/php/8.3/apache2/php.ini &
+
+Change : memory_limit = 128M
+To     : memory_limit = 512M
+
+Save file
+
+	sudo systemctl restart apache2
+
+Click Overview in the left pane and the message does not show anymore.
+
+2)----- Server has no maintenance window start time configured. This means resource intensive daily background jobs will also be executed during your main usage time. We recommend to set it to a time of low usage, so users are less impacted by the load caused from these heavy tasks. For more details see the documentation ↗.
+
+Add the next line to /var/www/nextcloud/config/config.php
+
+  'maintenance_window_start' => 1,
+  
+sudo systemctl restart apache2
+  
+3)----- One or more mimetype migrations are available. Occasionally new mimetypes are added to better handle certain file types. Migrating the mimetypes take a long time on larger instances so this is not done automatically during upgrades. 
+Use the command `occ maintenance:repair --include-expensive` to perform the migrations.
+
+sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
+
+4)----- The "Strict-Transport-Security"..........
+
+Configure some things in NextCloud.conf
+
+	sudo -i
+
+Check if the apache headers module is loaded :
+
+	sudo apachectl -t -D DUMP_MODULES | grep head
+or 	sudo apachectl -M | grep head
+
+This shows nothing ? :
+
+	sudo a2enmod headers
+    systemctl restart apache2
+
+Now check again :
+	sudo apachectl -t -D DUMP_MODULES | grep head
+It should say : 
+	headers_module (shared)
+
+Now change the NextCloud.conf :
+
+	sudo geany /etc/apache2/sites-available/NextCloud.conf &
+see :
+
+<Directory /var/www/nextcloud/>
+  Require all granted
+  AllowOverride All
+  Options FollowSymLinks MultiViews
+
+  <IfModule mod_dav.c>
+    Dav off
+  </IfModule>
+
+</Directory>
+
+change it to :
+
+
+<VirtualHost *:443>
+  ServerName 1.2.3.4
+  ServerAlias localhost
+  ServerAlias domain.name.one
+  ServerAlias domain.name.two
+
+    <Directory /var/www/nextcloud/>
+      Require all granted
+      AllowOverride All
+      Options FollowSymLinks MultiViews
+
+      <IfModule mod_dav.c>
+        Dav off
+      </IfModule>
+
+    </Directory>
+
+    <IfModule mod_headers.c>
+      Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+    </IfModule>
+
+</VirtualHost>
+
+save file
+
+	sudo systemctl restart apache2
+
+Click Overview in the left pane and the message does not show anymore.
+
+
+5)----- Detected some missing optional indices. Occasionally new indices are added (by Nextcloud or installed applications) to improve database performance. Adding indices can sometimes take awhile and temporarily hurt performance so this is not done automatically during upgrades. Once the indices are added, queries to those tables should be faster. Use the command `occ db:add-missing-indices` to add them. Missing indices: "systag_by_objectid" in table "systemtag_object_mapping". For more details see the documentation ↗.
+
+sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
+
+6)----- The PHP OPcache module is not properly configured. The OPcache interned strings buffer is nearly full. To assure that repeating strings can be effectively cached, it is recommended to apply "opcache.interned_strings_buffer" to your PHP configuration with a value higher than "8".. For more details see the documentation ↗.
+
+I resolved issues from 12..1 and this one was gone by the time I got to 6
+
+7)----- 1 warning in the logs since October 18, 2024, 9:50:46 AM
+
+Ignored, due to invalid password at login page.
+systemctl stop apache2
+rm /mnt/Share0/NextCloud/nextcloud.log
+systemctl start apache2
+
+Green bullet
+
+8)----- The database is used for transactional file locking. To enhance performance, please configure memcache, if available. For more details see the documentation ↗.
+
+----- The database is used for transactional file locking.
+
+The database is used for transactional file locking. To enhance performance, please configure memcache, if available. See the documentation :arrow_upper_right: for more information.
+
+I added Redis in socket mode.
+
+sudo apt update
+sudo apt upgrade
+sudo apt install redis-server php8.3-redis
+sudo phpenmod redis
+
+I changed the next lines in /etc/redis/redis.conf to prepare for socket mode:
+
+requirepass secret
+unixsocket /var/run/redis/redis-server.sock
+port 0
+unixsocketperm 760
+
+sudo systemctl restart redis
+
+Testing redis:
+
+First using user pi to receive an error which is just fine because pi has no rights to /run/redis/redis-server.sock
+redis-cli -a secret -s /run/redis/redis-server.sock ping
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+Could not connect to Redis at /run/redis/redis-server.sock: Permission denied
+
+From the root account after sudo -i
+
+redis-cli -a secret -s /run/redis/redis-server.sock ping
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+PONG
+
+use www-data to ping
+sudo usermod -aG redis www-data
+sudo -u www-data redis-cli -a secret -s /run/redis/redis-server.sock ping
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+PONG
+
+use www-data to create a value for test
+sudo -u www-data redis-cli -a secret -s /run/redis/redis-server.sock set test something
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+OK
+
+redis-cli -a secret -s /run/redis/redis-server.sock get test
+Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
+“something”
+
+So far so good, this works but now get it to work for Nextcloud.
+
+End of /var/www/nextcloud/config/config.php
+
+‘filelocking.enabled’ => true,
+‘memcache.local’ => ‘\OC\Memcache\APCu’,
+‘memcache.locking’ => ‘\OC\Memcache\Redis’,
+‘redis’ =>
+array (
+‘host’ => ‘/var/run/redis/redis-server.sock’,
+‘port’ => 0,
+‘timeout’ => 0.0,
+‘password’ => ‘secret’,
+),
+);
+
+I do not think the next is neseccary :
+
+sudo systemctl restart apache2
+
+The next command shows redis info:
+
+php --ri redis
+
+
+9)----- No memory cache has been configured. To enhance performance, please configure a memcache, if available. Further information can be found in the documentation ↗.
+
+sudo -i
+
+php8.3 -m | grep apc
+apt-get install php8.3-apcu
+php8.3 -m | grep apc
+phpenmod -v 8.3 apcu
+
+geany /var/www/nextcloud/config/config.php :
+
+Add :
+  'memcache.local' => '\OC\Memcache\APCu',
+
+/etc/php/8.1/apache2/php.ini
+
+    [opcache]
+    opcache.enable=1
+
+    opcache.enable_cli=1
+
+    opcache.interned_strings_buffer=8
+
+    opcache.max_accelerated_files=10000
+
+    opcache.memory_consumption=128
+
+    opcache.save_comments=1
+
+    opcache.revalidate_freq=1
+
+systemctl restart apache2
+
+For crontab job :
+
+https://docs.NextCloud.com/server/25/admin_manual/configuration_server/caching_configuration.html#id1
+
+APCu is disabled by default on CLI which could cause issues with NextCloud’s cron jobs. 
+Please make sure you set the apc.enable_cli to 1 on your php.ini config file or 
+append --define apc.enable_cli=1 to the cron job call.
+
+Whoopsie, the location of apc.enable_cli=1 is in /etc/php/8.3/mods-available/apcu.ini which now has 2 lines only :
+extension=apcu.so
+apc.enable_cli=1
+( Thanks to Reiner_Nippes in https://help.nextcloud.com/t/occ-wont-run-with-memcache-apcu/119724/6 )
+
+I do not need --define apc.enable_cli=1 in the crontab job like I did before :
+
+crontab -u www-data -l
+
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+#
+#0  12  *  *  * php -f /var/www/nextcloud/cron.php --define apc.enable_cli=1
+0  12  *  *  * php -f /var/www/nextcloud/cron.php
+
+To stay green I would need to run the job every 5 minutes like :
+
+*/5  *  *  *  * php -f /var/www/nextcloud/cron.php
+
+
+10)----- Your installation has no default phone region set
+
+sudo geany /var/www/nextcloud/config/config.php
+
+add :',
+  'default_phone_region' => 'NL',
+  
+sudo systemctl restart apache2
+
+11)----- You have not set or verified your email server configuration, yet. Please head over to the Basic settings in order to set them. Afterwards, use the "Send email" button below the form to verify your settings.
+
+Go to Administration settings, Basic Settings on the left, fill in details and test.
+
+12)----- The PHP module "imagick" is not enabled although the theming app is. For favicon generation to work correctly, you need to install and enable this module.
+
+php8.3 -m | grep magic
+apt install php8.3-imagick
+php8.3 -m | grep magic
+phpenmod -v 8.3 imagick
+systemctl restart apache2
+
+------------------------------------------------------------------------
+
+
+Here are the issues I ran into right after installation and some other things.
+
+Logon to your NextCloud website. 
+
+https://veraart.onthewifi.com/index.php/settings/admin/overview
+
+Add a second account as admin account. (just to be sure)
+
+Click Administrative setting.
+Click Overview in the left pane.
+See lots of messages :
+
+Security & setup warnings
+It's important for the security and performance of your instance that everything is configured correctly. To help you with that we are doing some automatic checks. Please see the linked documentation for more information.
+
+There are some errors regarding your setup.
+
+    1) The PHP memory limit is below the recommended value of 512MB.
+    2) You are accessing your instance over a secure connection, however your instance is generating insecure URLs. This most likely means that you are behind a reverse proxy and the overwrite config variables are not set correctly. Please read the documentation page about this ↗.
+    3) The "Strict-Transport-Security" HTTP header is not set to at least "15552000" seconds. For enhanced security, it is recommended to enable HSTS as described in the security tips ↗.
+    4) Your web server is not properly set up to resolve "/.well-known/caldav". Further information can be found in the documentation ↗.
+    5) Your web server is not properly set up to resolve "/.well-known/carddav". Further information can be found in the documentation ↗.
+    6) You have not set or verified your email server configuration, yet. Please head over to the Basic settings in order to set them. Afterwards, use the "Send email" button below the form to verify your settings.
+    7) Your installation has no default phone region set. This is required to validate phone numbers in the profile settings without a country code. To allow numbers without a country code, please add "default_phone_region" with the respective ISO 3166-1 code ↗ of the region to your config file.
+    8) No memory cache has been configured. To enhance performance, please configure a memcache, if available. Further information can be found in the documentation ↗.
+    9) The PHP module "imagick" is not enabled although the theming app is. For favicon generation to work correctly, you need to install and enable this module.
+
+Please double check the installation guides ↗, and check for any errors or warnings in the log.
+
+Check the security of your NextCloud over our security scan ↗.
+
+Version
+NextCloud Hub 3 (25.0.4)
+
+
+1)----- The PHP memory limit is below the recommended value of 512MB.
+
+	sudo geany /etc/php/8.1/apache2/php.ini &
+
+Change : memory_limit = 128M
+To     : memory_limit = 512M
+
+Save file
+
+	sudo systemctl restart apache2
+
+Click Overview in the left pane and the message does not show anymore.
+
+2)----- You are accessing your instance over a secure connection, however your instance is generating insecure URLs. This most likely means that you are behind a reverse proxy and the overwrite config variables are not set correctly. Please read the documentation page about this ↗.
+
+	sudo geany /var/www/nextcloud/config/config.php &
+
+  'overwriteprotocol' => 'https',
+
+	sudo systemctl restart apache2
+
+Click Overview in the left pane and the message does not show anymore.
+
+3)----- The "Strict-Transport-Security"..........
+
+Configure some things in NextCloud.conf
+
+	sudo -i
+
+Check if the apache headers module is loaded :
+
+	sudo apachectl -t -D DUMP_MODULES | grep head
+or 	sudo apachectl -M | grep head
+
+This shows nothing ? :
+
+	sudo a2enmod headers
+    systemctl restart apache2
+
+Now check again :
+	sudo apachectl -t -D DUMP_MODULES | grep head
+It should say : 
+	headers_module (shared)
+
+Now change the NextCloud.conf :
+
+	sudo geany /etc/apache2/sites-available/NextCloud.conf &
+see :
+
+<Directory /var/www/nextcloud/>
+  Require all granted
+  AllowOverride All
+  Options FollowSymLinks MultiViews
+
+  <IfModule mod_dav.c>
+    Dav off
+  </IfModule>
+
+</Directory>
+
+change it to :
+
+
+<VirtualHost *:443>
+  ServerName 1.2.3.4
+  ServerAlias localhost
+  ServerAlias domain.name.one
+  ServerAlias domain.name.two
+
+    <Directory /var/www/nextcloud/>
+      Require all granted
+      AllowOverride All
+      Options FollowSymLinks MultiViews
+
+      <IfModule mod_dav.c>
+        Dav off
+      </IfModule>
+
+    </Directory>
+
+    <IfModule mod_headers.c>
+      Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+    </IfModule>
+
+</VirtualHost>
+
+save file
+
+	sudo systemctl restart apache2
+
+Click Overview in the left pane and the message does not show anymore.
+
+4)----- and 5)----- Your web server is not properly set up to resolve......
+
+
+Configure some things in NextCloud.conf
+
+	sudo -i
+
+	geany /etc/apache2/sites-available/NextCloud.conf &
+
+
+Add the next 4 lines :
+
+    <IfModule mod_rewrite.c>
+    Redirect 301 /.well-known/carddav https://yourpublicipaddressorhostname/NextCloud/remote.php/dav
+    Redirect 301 /.well-known/caldav https://yourpublicipaddressorhostname/NextCloud/remote.php/dav
+    </IfModule>
+
+or better
+
+  RewriteEngine On
+  RewriteRule ^(.*/\.well-known/carddav)$ https://%{HTTP_HOST}/NextCloud/remote.php/dav [R=301,L]
+  RewriteRule ^(.*/\.well-known/caldav)$ https://%{HTTP_HOST}/NextCloud/remote.php/dav [R=301,L]
+
+
+Now it looks like :
+
+<VirtualHost *:443>
+  ServerName 1.2.3.4
+  ServerAlias localhost
+  ServerAlias domain.name.one
+  ServerAlias domain.name.two
+
+  RewriteEngine On
+  RewriteRule ^(.*/\.well-known/carddav)$ https://%{HTTP_HOST}/NextCloud/remote.php/dav [R=301,L]
+  RewriteRule ^(.*/\.well-known/caldav)$ https://%{HTTP_HOST}/NextCloud/remote.php/dav [R=301,L]
+
+    <Directory /var/www/html/NextCloud/>
+      Require all granted
+      AllowOverride All
+      Options FollowSymLinks MultiViews
+
+      <IfModule mod_dav.c>
+        Dav off
+      </IfModule>
+
+    </Directory>
+
+    <IfModule mod_headers.c>
+      Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+    </IfModule>
+
+</VirtualHost>
+
+sudo service apache2 restart
+
+NOTE !!!!
+
+Now the messages are gone if you logon to https://HOST/NextCloud
+where HOST is ServerName or one of the ServerAlias values.
+
+
+6)----- You have not set or verified your email server configuration, yet. Please head over to the Basic settings in order to set them. Afterwards, use the "Send email" button below the form to verify your settings.
+
+Go to Administration settings, Basic Settings on the left, fill in details and test.
+
+7)----- Your installation has no default phone region set
+
+sudo geany /var/www/nextcloud/config/config.php
+
+add :',
+  'default_phone_region' => 'NL',
+  
+sudo systemctl restart apache2
+
+
+8)----- No memory cache has been configured. To enhance performance, please configure a memcache, if available. Further information can be found in the documentation ↗.
+
+sudo -i
+
+php8.1 -m | grep apc
+apt-get install php8.1-apcu
+php8.1 -m | grep apc
+phpenmod -v 8.1 apcu
+
+geany /var/www/nextcloud/config/config.php :
+
+Add :
+  'memcache.local' => '\OC\Memcache\APCu',
+
+/etc/php/8.1/apache2/php.ini
+
+    [opcache]
+    opcache.enable=1
+
+    opcache.enable_cli=1
+
+    opcache.interned_strings_buffer=8
+
+    opcache.max_accelerated_files=10000
+
+    opcache.memory_consumption=128
+
+    opcache.save_comments=1
+
+    opcache.revalidate_freq=1
+
+systemctl restart apache2
+
+For crontab job :
+
+https://docs.NextCloud.com/server/25/admin_manual/configuration_server/caching_configuration.html#id1
+
+APCu is disabled by default on CLI which could cause issues with NextCloud’s cron jobs. 
+Please make sure you set the apc.enable_cli to 1 on your php.ini config file or 
+append --define apc.enable_cli=1 to the cron job call.
+
+Whoopsie, the location of apc.enable_cli=1 is in /etc/php/8.1/mods-available/apcu.ini which now has 2 lines only :
+extension=apcu.so
+apc.enable_cli=1
+( Thanks to Reiner_Nippes in https://help.nextcloud.com/t/occ-wont-run-with-memcache-apcu/119724/6 )
+
+I do not need --define apc.enable_cli=1 in the crontab job like I did before :
+
+crontab -u www-data -l
+
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+#
+#0  12  *  *  * php -f /var/www/nextcloud/cron.php --define apc.enable_cli=1
+0  12  *  *  * php -f /var/www/nextcloud/cron.php
+
+To stay green I would need to run the job every 5 minutes like :
+
+*/5  *  *  *  * php -f /var/www/nextcloud/cron.php
+
+
+9)----- The PHP module "imagick" is not enabled although the theming app is. For favicon generation to work correctly, you need to install and enable this module.
+
+php8.1 -m | grep magic
+apt install php8.1-imagick
+php8.1 -m | grep magic
+phpenmod -v 8.1 imagick
+systemctl restart apache2
+
+---------------------
+
+Your admin did not set a location
+
+Web login as an administrator and select Personal > Privacy
+Click on the pen next to "your data is located in" and fill in your country.
+
+-------- Add Lets Encrypt certificate
+
+This will give you an automatic refreshing offical supported certificate so there will be no warnings anymore when you access your server over the internet.
+The 3650 day certificate created before will still be used for acces via localhost and the local ip adress.
+
+https://pimylifeup.com/raspberry-pi-ssl-lets-encrypt/
+
+sudo apt update
+sudo apt upgrade
+
+
+sudo apt install python3-certbot-apache
+
+sudo apt install certbot
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+certbot is already the newest version (1.12.0-2).
+certbot set to manually installed.
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+
+
+
+
+sudo certbot --apache
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator apache, Installer apache
+Enter email address (used for urgent renewal and security notices)
+ (Enter 'c' to cancel): mymailadress@something.else
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please read the Terms of Service at
+https://letsencrypt.org/documents/LE-SA-v1.3-September-21-2022.pdf. You must
+agree in order to register with the ACME server. Do you agree?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: Y
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Would you be willing, once your first certificate is successfully issued, to
+share your email address with the Electronic Frontier Foundation, a founding
+partner of the Let's Encrypt project and the non-profit organization that
+develops Certbot? We'd like to send you email about our work encrypting the web,
+EFF news, campaigns, and ways to support digital freedom.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: N
+Account registered.
+
+Which names would you like to activate HTTPS for?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: veraart.onthewifi.com
+2: veraart.thehomeserver.net
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate numbers separated by commas and/or spaces, or leave input
+blank to select all options shown (Enter 'c' to cancel): 
+Requesting a certificate for veraart.onthewifi.com and veraart.thehomeserver.net
+Performing the following challenges:
+http-01 challenge for veraart.onthewifi.com
+http-01 challenge for veraart.thehomeserver.net
+Waiting for verification...
+Cleaning up challenges
+Deploying Certificate to VirtualHost /etc/apache2/sites-enabled/nextcloud.conf
+Deploying Certificate to VirtualHost /etc/apache2/sites-enabled/nextcloud.conf
+Added an HTTP->HTTPS rewrite in addition to other RewriteRules; you may wish to check for overall consistency.
+Redirecting vhost in /etc/apache2/sites-enabled/000-default.conf to ssl vhost in /etc/apache2/sites-enabled/nextcloud.conf
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Congratulations! You have successfully enabled https://veraart.onthewifi.com and
+https://veraart.thehomeserver.net
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/veraart.onthewifi.com/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/veraart.onthewifi.com/privkey.pem
+   Your certificate will expire on 2023-06-09. To obtain a new or
+   tweaked version of this certificate in the future, simply run
+   certbot again with the "certonly" option. To non-interactively
+   renew *all* of your certificates, run "certbot renew"
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+
+tail /etc/apache2/sites-available/nextcloud.conf 
+# https://help.nextcloud.com/t/security-host-prefix-how-to-fix/30956/20
+#      Header set Referrer-Policy "no-referrer-when-downgrade"
+#      Header edit Set-Cookie ^(.*)$ "$1;HttpOnly;Secure;SameSite=Strict"
+      
+    </IfModule>
+
+Include /etc/letsencrypt/options-ssl-apache.conf
+SSLCertificateFile /etc/letsencrypt/live/veraart.onthewifi.com/fullchain.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/veraart.onthewifi.com/privkey.pem
+</VirtualHost>
+
+The next file is included in nextcloud.config :
+
+cat /etc/letsencrypt/options-ssl-apache.conf
+
+# This file contains important security parameters. If you modify this file
+# manually, Certbot will be unable to automatically provide future security
+# updates. Instead, Certbot will print and log an error message with a path to
+# the up-to-date file that you will need to refer to when manually updating
+# this file.
+
+SSLEngine on
+
+# Intermediate configuration, tweak to your needs
+SSLProtocol             all -SSLv2 -SSLv3
+SSLCipherSuite          ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
+SSLHonorCipherOrder     on
+SSLCompression          off
+
+SSLOptions +StrictRequire
+
+# Add vhost name to log entries:
+LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" vhost_combined
+LogFormat "%v %h %l %u %t \"%r\" %>s %b" vhost_common
+
+#CustomLog /var/log/apache2/access.log vhost_combined
+#LogLevel warn
+#ErrorLog /var/log/apache2/error.log
+
+# Always ensure Cookies have "Secure" set (JAH 2012/1)
+#Header edit Set-Cookie (?i)^(.*)(;\s*secure)??((\s*;)?(.*)) "$1; Secure$3$4"
+
+Browse to nextcloud via Internet and check the certificate "Verified by: Let's Encrypt"
+
+To see the update job : cat /etc/cron.d/certbot
+
+# /etc/cron.d/certbot: crontab entries for the certbot package
+#
+# Upstream recommends attempting renewal twice a day
+#
+# Eventually, this will be an opportunity to validate certificates
+# haven't been revoked, etc.  Renewal will only occur if expiration
+# is within 30 days.
+#
+# Important Note!  This cronjob will NOT be executed if you are
+# running systemd as your init system.  If you are running systemd,
+# the cronjob.timer function takes precedence over this cronjob.  For
+# more details, see the systemd.timer manpage, or use systemctl show
+# certbot.timer.
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 */12 * * * root test -x /usr/bin/certbot -a \! -d /run/systemd/system && perl -e 'sleep int(rand(43200))' && certbot -q renew
+
+

@@ -1,0 +1,5 @@
+----- The database is missing some indices
+    
+    sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
+    
+Click Overview in the left pane and the message does not show anymore.

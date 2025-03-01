@@ -32,6 +32,7 @@ Warning: Using a password with ‘-a’ or ‘-u’ option on the command line i
 PONG
 
 use www-data to ping
+sudo usermod -aG redis www-data
 sudo -u www-data redis-cli -a secret -s /run/redis/redis-server.sock ping
 Warning: Using a password with ‘-a’ or ‘-u’ option on the command line interface may not be safe.
 PONG

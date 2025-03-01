@@ -1,0 +1,110 @@
+----- 10. Mimetype Migration Issue After Updating to 31.0.0
+
+One or more mimetype migrations are available. Occasionally new mimetypes are added to better handle certain file types. Migrating the mimetypes take a long time on larger instances so this is not done automatically during upgrades. Use the command `occ maintenance:repair --include-expensive` to perform the migrations.
+
+I ran the command below and refreshed my screen and the message was gone:
+
+sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
+
+ - Repair MySQL collation
+     - All tables already have the correct collation -> nothing to do
+ - Clean tags and favorites
+     - 0 tags of deleted users have been removed.
+     - 0 tags for delete files have been removed.
+     - 0 tag entries for deleted tags have been removed.
+     - 0 tags with no entries have been removed.
+ - Repair invalid shares
+ - Move .step file of updater to backup location
+ - Add move avatar background job
+     - Repair step already executed
+ - Add preview cleanup background jobs
+ - Migrate oauth2_clients table to nextcloud schema
+     - Update the oauth2_access_tokens table schema.
+     - Update the oauth2_clients table schema.
+     - Delete clients (and their related access tokens) with the redirect_uri starting with oc:// or ending with *
+ - Repair language codes
+ - Add log rotate job
+ - Clear frontend caches
+     - Image cache cleared
+     - JS cache cleared
+ - Clear every generated avatar
+ - Add preview background cleanup job
+ - Queue a one-time job to cleanup old backups of the updater
+ - Cleanup invalid photocache files for carddav
+ - Add background job to cleanup login flow v2 tokens
+ - Remove potentially over exposing share links
+     - No need to remove link shares.
+ - Clear access cache of projects
+ - Reset generated avatar flag
+ - Keep legacy encryption enabled
+ - Check encryption key format
+ - Remove old dashboard app config data
+ - Add job to cleanup the bruteforce entries
+ - Queue a one-time job to check for user uploaded certificates
+ - Repair DAV shares
+ - Add background job to set the lookup server share state for users
+ - Add token cleanup job
+ - Clean up abandoned apps
+ - Add possibly missing system config
+ - Add AI tasks cleanup jobs
+ - Queue a job to generate metadata
+ - migrate lazy config values
+ - Cache logo dimension to fix size in emails on Outlook
+     - Theming is not used to provide a logo
+ - Remove legacy ".ocdata" file
+ - Add cleanup-deleted-users background job
+ - Validate account properties and store phone numbers in a known format for search
+     - Queued background to validate account properties.
+ - Remove shares of old group memberships
+ - Remove broken DAV object properties
+     - 0 broken object properties removed
+ - Repair mime types
+ - Handle outdated scheduling events
+     - Cleaning up old scheduling events
+ - AppAPI Daemons configuration GPU params update
+     - Daemons configuration GPU params updated: 0
+ - Upgrading Circles App
+ - Fix component of birthday calendars
+     - 5 birthday calendars updated.
+ - Regenerating birthday calendars to use new icons and fix old birthday events without year
+     - Repair step already executed
+ - Fix broken values of calendar objects
+    0 [->--------------------------]
+ - Registering building of calendar search index as background job
+     - Repair step already executed
+ - Register building of social profile search index as background job
+     - Repair step already executed
+ - Registering background jobs to update cache for webcal calendars
+     - Added 0 background jobs to update webcal calendars
+ - Registering building of calendar reminder index as background job
+     - Repair step already executed
+ - Clean up orphan event and contact data
+     - 0 events without a calendar have been cleaned up
+     - 0 properties without an events have been cleaned up
+     - 0 changes without a calendar have been cleaned up
+     - 0 cached events without a calendar subscription have been cleaned up
+     - 0 changes without a calendar subscription have been cleaned up
+     - 0 contacts without an addressbook have been cleaned up
+     - 0 properties without a contact have been cleaned up
+     - 0 changes without an addressbook have been cleaned up
+ - Remove activity entries of private events
+     - Removed 0 activity entries
+ - Clean up old calendar subscriptions from deleted users that were not cleaned-up
+    0 [----->----------------------]
+     - 0 calendar subscriptions without an user have been cleaned up
+ - Remove invalid object properties
+     - 0 invalid object properties removed.
+ - Fix the share type of guest shares when migrating from ownCloud
+ - Copy the share password into the dedicated column
+ - Set existing shares as accepted
+ - Update OAuth token expiration times
+ - init metadata
+ - Switches from default updater server to the customer one if a valid subscription is available
+     - Repair step already executed
+ - Migrate some config values to lazy loading
+ - Send an admin notification if monthly report is disabled
+ - Force-reset all Text document sessions
+ - Initialize migration of background images from dashboard to theming app
+ - Add background job to check for backup codes
+ - Populating added database structures for workflow
+
