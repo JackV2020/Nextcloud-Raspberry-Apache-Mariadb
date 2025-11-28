@@ -1,0 +1,7 @@
+----- AppAPI default deploy daemon is not set. 31.0.2
+
+AppAPI default deploy daemon is not set.
+
+Please register a default deploy daemon in the settings to install External Apps (Ex-Apps).
+
+I have no external Apps so... Goto > Apps > Active Apps and disable AppAPI

@@ -6,9 +6,10 @@ All solutions to the issues I had right after finishing the installation are in 
 
 Issues solved during installations and upgrades before are in other documents in the old notes folder.
 
-Current version Nextcloud is 31.0.0
+Current version Nextcloud is 32.0.2
 
 Issues after last installation:
 
     01. The database is missing some indices
     02. Mimetype Migration Issue After Updating to 31.0.0
+    03. AppAPI deploy daemon 32.0.2.txt

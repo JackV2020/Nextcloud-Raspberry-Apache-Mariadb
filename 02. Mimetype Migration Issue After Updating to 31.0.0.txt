@@ -1,4 +1,4 @@
------ 10. Mimetype Migration Issue After Updating to 31.0.0
+----- Mimetype Migration Issue After Updating to 31.0.0
 
 One or more mimetype migrations are available. Occasionally new mimetypes are added to better handle certain file types. Migrating the mimetypes take a long time on larger instances so this is not done automatically during upgrades. Use the command `occ maintenance:repair --include-expensive` to perform the migrations.
 
